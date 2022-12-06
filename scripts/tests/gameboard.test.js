@@ -55,3 +55,35 @@ test("Doesn't place a new ship when coords are not valid (when they are outside 
     expect(newBoard.board[2][1]).toBe("");
     expect(newBoard.board[2][2]).toBe("");
 });
+
+
+// Tests for 'receiveAttack' method
+test("receiveAttack correctly registers a missed shot", () => {
+    newBoard.receiveAttack([3, 3]);
+    newBoard.receiveAttack([8, 0]);
+    newBoard.receiveAttack([2, 7]);
+    newBoard.receiveAttack([4, 3]);
+    newBoard.receiveAttack([1, 6]);
+
+    expect(newBoard.board[3][3]).toBe("/");
+    expect(newBoard.board[8][0]).toBe("/");
+    expect(newBoard.board[2][7]).toBe("/");
+    expect(newBoard.board[4][3]).toBe("/");
+    expect(newBoard.board[1][6]).toBe("/");
+});
+
+test("receiveAttack determines whether or not the attack hit a ship", () => {
+    newBoard.receiveAttack([0, 0]);
+    newBoard.receiveAttack([1, 2]);
+    newBoard.receiveAttack([1, 3]);
+    newBoard.receiveAttack([5, 2]);
+    newBoard.receiveAttack([5, 4]);
+    newBoard.receiveAttack([5, 6]);
+
+    expect(newBoard.board[0][0]).toBe("X");
+    expect(newBoard.board[1][2]).toBe("X");
+    expect(newBoard.board[1][3]).toBe("X");
+    expect(newBoard.board[5][2]).toBe("X");
+    expect(newBoard.board[5][4]).toBe("X");
+    expect(newBoard.board[5][6]).toBe("X");
+});

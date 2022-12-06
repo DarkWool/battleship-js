@@ -28,9 +28,26 @@ function gameboard() {
         }
     }
 
+    function receiveAttack(coords) {
+        const [coordY, coordX] = coords;
+
+        // If you find a number on the given coords then a ship will be hit!
+        if (typeof board[coordY][coordX] === "number") {
+            const index = board[coordY][coordX];
+            ships[index].hit();
+            
+            board[coordY][coordX] = "X";
+            return;
+        }
+        
+        // Record a missed shot on the board
+        board[coordY][coordX] = "/";
+    }
+
     return {
         board,
-        placeShip
+        placeShip,
+        receiveAttack
     }
 }
 
