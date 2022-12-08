@@ -44,10 +44,15 @@ function gameboard() {
         board[coordY][coordX] = "/";
     }
 
+    function checkForLeftShips() {
+        return ships.every(ship => ship.isSunk());
+    }
+
     return {
         board,
         placeShip,
-        receiveAttack
+        receiveAttack,
+        checkForLeftShips
     }
 }
 
