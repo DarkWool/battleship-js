@@ -1,26 +1,24 @@
 import { ship } from "./ship.js";
 
 function gameboard() {
-    const board = [];  // Stores the board in an array like-way
-    const ships = [];  // Stores the ship objects that are on the gameboard
-
-    // Create a board filled with arrays that contain an empty string
+    const board = [];
+    const ships = [];
+    
     for (let i = 0; i < 10; i++) {
         const row = Array.from({ length: 10 }, (x) => "");
         board.push(row);
     }
 
-    function placeShip(coordX, coordY, length) {
-        // Check if the coordinates are valid
-        const finalPosX = coordX + length;
-        if ((coordX < 0 || coordY < 0) || (finalPosX > 9 || coordY > 9)) return false;
+    function placeShip(coords, length) {
+        const [coordY, coordX] = coords;
 
-        // Check if a ship is not already in the given coordinates
+        // Check if the new ship coords are not yet taken by another ship or outside the board's bounds
         for (let i = 0; i < length; i++) {
-            if (typeof board[coordY][coordX + i] === "number") return false;
+            const gameBox = board[coordY][coordX + i];
+            if (typeof gameBox === "number" || gameBox == undefined) return false;
         }
 
-        // Place the new ship
+        // Create and place the new ship
         const newShip = ship(length);
         const newShipIndex = ships.push(newShip) - 1;
         for (let i = 0; i < length; i++) {
@@ -35,8 +33,8 @@ function gameboard() {
         if (typeof board[coordY][coordX] === "number") {
             const index = board[coordY][coordX];
             ships[index].hit();
-            
             board[coordY][coordX] = "X";
+            
             return;
         }
         
@@ -44,16 +42,15 @@ function gameboard() {
         board[coordY][coordX] = "/";
     }
 
-    function checkForLeftShips() {
-        return ships.every(ship => ship.isSunk());
-    }
+    const checkForLeftShips = () => ships.every(ship => ship.isSunk());
+    const getBoard = () => board;
 
     return {
-        board,
+        getBoard,
         placeShip,
         receiveAttack,
-        checkForLeftShips
-    }
+        checkForLeftShips,
+    };
 }
 
 export {
