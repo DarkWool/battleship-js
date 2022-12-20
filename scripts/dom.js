@@ -2,37 +2,57 @@ import { gameController } from "./gameController.js";
 
 function domController() {
     const game = gameController();
-    let boards = game.getBoards();
+    const players = game.getPlayers();
 
-    const playersBoards = document.querySelectorAll("[data-player]");
-    const boardAContainer = playersBoards[0];
-    const boardBContainer = playersBoards[1];
+    const gameboards = document.getElementsByClassName("game_boards")[0];
+    const turn = document.getElementsByClassName("game_turn")[0];
 
-    const renderBoards = (boards) => {
-        const boardA = createBoardUI(boards[0]);
-        const boardB = createBoardUI(boards[1]);
+    const renderBoards = () => {
+        gameboards.innerHTML = "";
 
-        boardAContainer.innerHTML = "";
-        boardBContainer.innerHTML = "";
-        boardAContainer.append(boardA);
-        boardBContainer.append(boardB);
+        let index = 0;
+        for (const player of players) {
+            const board = player.gameboard.getBoard();
+            const boardUI = createBoardUI(board, index);
+            gameboards.append(boardUI);
+            index++;
+        }
     };
 
-    const createBoardUI = (board) => {
-        const fragment = document.createDocumentFragment();
-        board.forEach(row => {
-            row.forEach(col => {
+    const createBoardUI = (board, boardIndex) => {
+        const newBoard = document.createElement("section");
+        newBoard.classList.add("board");
+        if (boardIndex !== 0) newBoard.classList.add("enemy");
+
+        board.forEach((row, rowIndex) => {
+            row.forEach((col, colIndex) => {
                 const box = document.createElement("div");
                 box.textContent = col;
 
-                fragment.append(box);
+                if (boardIndex !== 0) {
+                    box.addEventListener("click", e => {
+                        console.log(`[${rowIndex}, ${colIndex}]`);
+                            
+                        const result = game.playTurn([rowIndex, colIndex]);
+                        if (result) e.currentTarget.classList.add("hit");
+
+                        e.currentTarget.textContent = "●";
+
+                        updateTurn();
+                    }, { once: true });
+                }
+                
+                newBoard.append(box);
             });
         });
 
-        return fragment;
+        return newBoard;
     };
 
-    renderBoards(boards);
+    const updateTurn = () => turn.textContent = `${game.getCurrentPlayer().name}'s turn`;
+
+    renderBoards();
+    updateTurn();
 }
 
 domController();

@@ -35,11 +35,12 @@ function gameboard() {
             ships[index].hit();
             board[coordY][coordX] = "X";
             
-            return;
+            return true;
         }
         
         // Record a missed shot on the board
         board[coordY][coordX] = "/";
+        return false;
     }
 
     const checkForLeftShips = () => ships.every(ship => ship.isSunk());
