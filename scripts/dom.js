@@ -1,12 +1,14 @@
 import { gameController } from "./gameController.js";
 
 function domController() {
+    const MARKER = "●";
     const game = gameController();
     const players = game.getPlayers();
 
     const gameboards = document.getElementsByClassName("game_boards")[0];
     const turn = document.getElementsByClassName("game_turn")[0];
 
+    
     const renderBoards = () => {
         gameboards.innerHTML = "";
 
@@ -29,16 +31,19 @@ function domController() {
                 const box = document.createElement("div");
                 box.textContent = col;
 
+                if (col === "X" || col === "/") box.textContent = MARKER;
+                (col === "X") ? box.classList.add("hit") : false;
+
                 if (boardIndex !== 0) {
                     box.addEventListener("click", e => {
-                        console.log(`[${rowIndex}, ${colIndex}]`);
-                            
+                        // console.log(`[${rowIndex}, ${colIndex}]`);
+
                         const result = game.playTurn([rowIndex, colIndex]);
                         if (result) e.currentTarget.classList.add("hit");
-
                         e.currentTarget.textContent = "●";
 
                         updateTurn();
+                        computerTurn();
                     }, { once: true });
                 }
                 
@@ -50,6 +55,14 @@ function domController() {
     };
 
     const updateTurn = () => turn.textContent = `${game.getCurrentPlayer().name}'s turn`;
+
+    const computerTurn = () => {
+        setTimeout(() => {
+            game.playComputerTurn();
+            updateTurn();
+            renderBoards();
+        }, 1500);
+    };
 
     renderBoards();
     updateTurn();

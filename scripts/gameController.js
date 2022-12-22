@@ -8,6 +8,7 @@ function gameController() {
     
     let playerTurn = playerA;
 
+
     // Predefined coords
     playerA.gameboard.placeShip([0, 0], 5);
     playerA.gameboard.placeShip([7, 6], 4);
@@ -21,17 +22,28 @@ function gameController() {
     playerB.gameboard.placeShip([2, 1], 3);
     playerB.gameboard.placeShip([5, 5], 2);
 
+
     const getPlayers = () => players;
     const getCurrentPlayer = () => playerTurn;
 
+    // Single player mode
     const playTurn = (coords) => {
         const currPlayer = getCurrentPlayer();
-        const playerToAttack = players.find(player => player.name !== currPlayer.name);
-
-        switchTurn();
+        const enemy = players.find(player => player.name !== currPlayer.name);
+        const wasHit = currPlayer.attack(enemy.gameboard, coords);
         
-        const wasHit = currPlayer.attack(playerToAttack.gameboard, coords);
+        switchTurn();
         return wasHit;
+    };
+
+    const playComputerTurn = () => {
+        const coordY = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+        const coordX = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
+
+        console.log(`COMPUTER COORDS => [${coordY}, ${coordX}]`);
+
+        playerB.attack(playerA.gameboard, [coordY, coordX]);
+        switchTurn();
     };
 
     function switchTurn() {
@@ -43,7 +55,8 @@ function gameController() {
     return {
         getPlayers,
         getCurrentPlayer,
-        playTurn
+        playTurn,
+        playComputerTurn
     };
 }
 
