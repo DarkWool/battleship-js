@@ -30,27 +30,37 @@ function gameController() {
     const playTurn = (coords) => {
         const currPlayer = getCurrentPlayer();
         const enemy = players.find(player => player.name !== currPlayer.name);
-        const wasHit = currPlayer.attack(enemy.gameboard, coords);
+        const shipHit = currPlayer.attack(enemy.gameboard, coords);
         
-        switchTurn();
-        return wasHit;
+        // Before changing turn check if the curr player has won
+        const isGameWon = checkWin(enemy.gameboard);
+        if (!isGameWon) switchTurn();
+
+        return {
+            shipHit,
+            isGameWon,
+        };
     };
 
     const playComputerTurn = () => {
         const coordY = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
         const coordX = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
-
         console.log(`COMPUTER COORDS => [${coordY}, ${coordX}]`);
 
         playerB.attack(playerA.gameboard, [coordY, coordX]);
+
+        if (checkWin(playerA.gameboard) === true) return true;
         switchTurn();
     };
 
-    function switchTurn() {
+    const switchTurn = () => {
         playerTurn = (playerTurn.name === players[0].name) ?
             players[1] :
             players[0];
-    }
+    };
+
+    const checkWin = (gameboard) => gameboard.checkForLeftShips();
+
 
     return {
         getPlayers,

@@ -5,10 +5,15 @@ function domController() {
     const game = gameController();
     const players = game.getPlayers();
 
+    
+    // DOM cache
     const gameboards = document.getElementsByClassName("game_boards")[0];
     const turn = document.getElementsByClassName("game_turn")[0];
-
+    const winModal = document.getElementsByClassName("game_win-modal")[0];
+    const winMessageModal = winModal.getElementsByClassName("win_msg")[0];
+    const winMessageTitle = winMessageModal.getElementsByClassName("win_msg-title")[0];
     
+
     const renderBoards = () => {
         gameboards.innerHTML = "";
 
@@ -31,21 +36,16 @@ function domController() {
                 const box = document.createElement("div");
                 box.textContent = col;
 
-                if (col === "X" || col === "/") box.textContent = MARKER;
-                (col === "X") ? box.classList.add("hit") : false;
+                if (boardIndex !== 0) box.addEventListener("click", e => {
+                    e.currentTarget.textContent = MARKER;
 
-                if (boardIndex !== 0) {
-                    box.addEventListener("click", e => {
-                        // console.log(`[${rowIndex}, ${colIndex}]`);
+                    const turn = game.playTurn([rowIndex, colIndex]);
+                    if (turn.shipHit) e.currentTarget.classList.add("hit");
+                    if (turn.isGameWon) return showWinMessage();
 
-                        const result = game.playTurn([rowIndex, colIndex]);
-                        if (result) e.currentTarget.classList.add("hit");
-                        e.currentTarget.textContent = "●";
-
-                        updateTurn();
-                        computerTurn();
-                    }, { once: true });
-                }
+                    updateTurn();
+                    computerTurn();
+                }, { once: true });
                 
                 newBoard.append(box);
             });
@@ -62,6 +62,12 @@ function domController() {
             updateTurn();
             renderBoards();
         }, 1500);
+    };
+
+    const showWinMessage = () => {
+        winMessageTitle.textContent = `${game.getCurrentPlayer().name} CONQUERED!`;
+        winModal.classList.add("active");
+        winMessageModal.classList.add("active");
     };
 
     renderBoards();
