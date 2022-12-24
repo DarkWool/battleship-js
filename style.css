@@ -11,6 +11,11 @@
   color: white;
 }
 
+:root {
+  --accent: hsl(216, 100%, 50%);
+  --darkBlue: hsl(210, 55%, 4%);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -142,10 +147,94 @@ h1 {
 
 
 
+/* ----- Win modal ----- */
+.game_win-modal {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.game_win-modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.win_msg {
+  position: absolute;
+  top: calc(50% - 30px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 575px;
+  padding: 80px 80px 100px;
+  text-align: center;
+  border-bottom: 15px solid var(--accent);
+  border-radius: 10px;
+  background-color: var(--darkBlue);
+  box-shadow: 0px 8px 6.6px rgba(0, 0, 0, 0.041), 0px 23.7px 24.9px rgba(0, 0, 0, 0.055), 0px 52.9px 61.9px rgba(0, 0, 0, 0.062), 0px 107.1px 91.1px rgba(0, 0, 0, 0.067), 0px 181px 105px rgba(0, 0, 0, 0.07);
+  transition: top 0.4s, opacity 0.4s ease;
+  opacity: 0;
+}
+
+.win_msg.active {
+  top: 50%;
+  opacity: 1;
+}
+
+.win_msg-title {
+  font-size: 5.6rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.win_msg > p {
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.win_msg-img {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  max-width: 500px;
+  transform: translateX(-40%) translateY(30%);
+  pointer-events: none;
+}
+
+
+
+
+/* ----- Buttons ----- */
+button {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+}
+
+.restart-btn {
+  padding: 15px 30px;
+  font-size: 2.4rem;
+  font-weight: 800;
+  border-radius: 2px;
+  color: var(--darkBlue);
+  background-color: var(--accent);
+}
+
+
+
+
 /* ----- Utilities ----- */
 .content-margin {
   margin: 0 auto;
   max-width: 1400px;
   padding-left: 25px;
   padding-right: 25px;
+}
+
+.dark-overlay {
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(5, 21, 43, 0.7);
 }
