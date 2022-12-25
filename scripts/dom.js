@@ -4,8 +4,9 @@ function domController() {
     const MARKER = "●";
     const game = gameController();
     const players = game.getPlayers();
+    let isComputerTurn = false;
 
-    
+
     // DOM cache
     const gameboards = document.getElementsByClassName("game_boards")[0];
     const turn = document.getElementsByClassName("game_turn")[0];
@@ -37,6 +38,9 @@ function domController() {
                 box.textContent = col;
 
                 if (boardIndex !== 0) box.addEventListener("click", e => {
+                    if (isComputerTurn) return;
+                    isComputerTurn = true;
+
                     e.currentTarget.textContent = MARKER;
 
                     const turn = game.playTurn([rowIndex, colIndex]);
@@ -61,6 +65,7 @@ function domController() {
             game.playComputerTurn();
             updateTurn();
             renderBoards();
+            isComputerTurn = false;
         }, 1500);
     };
 
