@@ -1,13 +1,13 @@
 import { player } from "./player.js";
+import { computerPlayer } from "./computerPlayer.js";
 import { gameboard } from "./gameboard.js";
 
 function gameController() {
     const playerA = player("Wool", gameboard());
-    const playerB = player("PC", gameboard());
+    const playerB = computerPlayer("PC", gameboard());
     const players = [playerA, playerB];
     
     let playerTurn = playerA;
-
 
     // Predefined coords
     playerA.gameboard.placeShip([0, 0], 5);
@@ -24,9 +24,9 @@ function gameController() {
 
 
     const getPlayers = () => players;
+
     const getCurrentPlayer = () => playerTurn;
 
-    // Single player mode
     const playTurn = (coords) => {
         const currPlayer = getCurrentPlayer();
         const enemy = players.find(player => player.name !== currPlayer.name);
@@ -43,23 +43,26 @@ function gameController() {
     };
 
     const playComputerTurn = () => {
-        const coordY = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
-        const coordX = Math.floor(Math.random() * (9 - 0 + 1)) + 0;
-        console.log(`COMPUTER COORDS => [${coordY}, ${coordX}]`);
+        const currPlayer = getCurrentPlayer();
+        const enemy = players.find(player => player.name !== currPlayer.name);
+        const shipHit = playerB.attack(playerA.gameboard);
 
-        playerB.attack(playerA.gameboard, [coordY, coordX]);
+        const isGameWon = checkWin(enemy.gameboard);
+        if (!isGameWon) switchTurn();
 
-        if (checkWin(playerA.gameboard) === true) return true;
-        switchTurn();
+        return {
+            shipHit,
+            isGameWon,
+        };
     };
 
     const switchTurn = () => {
-        playerTurn = (playerTurn.name === players[0].name) ?
+        playerTurn = (playerTurn === players[0]) ?
             players[1] :
             players[0];
     };
-
-    const checkWin = (gameboard) => gameboard.checkForLeftShips();
+    
+    const checkWin = (gameboard) => gameboard.areAllShipsSunk();
 
 
     return {

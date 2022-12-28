@@ -11,11 +11,12 @@ function gameboard() {
 
     function placeShip(coords, length) {
         const [coordY, coordX] = coords;
+        if (!board[coordY]) return false;
 
         // Check if the new ship coords are not yet taken by another ship or outside the board's bounds
         for (let i = 0; i < length; i++) {
-            const gameBox = board[coordY][coordX + i];
-            if (typeof gameBox === "number" || gameBox == undefined) return false;
+            const box = board[coordY][coordX + i];
+            if (typeof box === "number" || box == undefined) return false;
         }
 
         // Create and place the new ship
@@ -43,14 +44,21 @@ function gameboard() {
         return false;
     }
 
-    const checkForLeftShips = () => ships.every(ship => ship.isSunk());
+    const areAllShipsSunk = () => ships.every(ship => ship.isSunk());
+    
     const getBoard = () => board;
+
+    function isBoxAvailable(coords) {
+        const box = board[coords[0]][coords[1]];
+        return (box !== "/" && box !== "X") ? true : false;
+    }
 
     return {
         getBoard,
         placeShip,
         receiveAttack,
-        checkForLeftShips,
+        areAllShipsSunk,
+        isBoxAvailable,
     };
 }
 

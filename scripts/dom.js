@@ -13,7 +13,8 @@ function domController() {
     const winModal = document.getElementsByClassName("game_win-modal")[0];
     const winMessageModal = winModal.getElementsByClassName("win_msg")[0];
     const winMessageTitle = winMessageModal.getElementsByClassName("win_msg-title")[0];
-    
+    const boards = [];
+
 
     const renderBoards = () => {
         gameboards.innerHTML = "";
@@ -23,10 +24,11 @@ function domController() {
             const board = player.gameboard.getBoard();
             const boardUI = createBoardUI(board, index);
             gameboards.append(boardUI);
+            boards.push(boardUI);
             index++;
         }
     };
-
+    
     const createBoardUI = (board, boardIndex) => {
         const newBoard = document.createElement("section");
         newBoard.classList.add("board");
@@ -39,17 +41,17 @@ function domController() {
 
                 if (boardIndex !== 0) box.addEventListener("click", e => {
                     if (isComputerTurn) return;
+                    else if (players[boardIndex].gameboard.isBoxAvailable([rowIndex, colIndex]) === false) return;
+
                     isComputerTurn = true;
 
-                    e.currentTarget.textContent = MARKER;
-
                     const turn = game.playTurn([rowIndex, colIndex]);
-                    if (turn.shipHit) e.currentTarget.classList.add("hit");
-                    if (turn.isGameWon) return showWinMessage();
+                    handleTurnResult(turn, e.currentTarget);
+                    e.currentTarget.classList.add("not-available");
 
                     updateTurn();
                     computerTurn();
-                }, { once: true });
+                });
                 
                 newBoard.append(box);
             });
@@ -62,11 +64,22 @@ function domController() {
 
     const computerTurn = () => {
         setTimeout(() => {
-            game.playComputerTurn();
+            const turn = game.playComputerTurn();
+
+            const coords = players[1].getLastCoords;
+            const boxNumber = coords[0] * 10 + coords[1];
+            handleTurnResult(turn, boards[0].children[boxNumber]);
+            
             updateTurn();
-            renderBoards();
             isComputerTurn = false;
         }, 1500);
+    };
+
+    const handleTurnResult = (turnResult, box) => {
+        box.textContent = MARKER;
+
+        if (turnResult.shipHit) box.classList.add("hit");
+        if (turnResult.isGameWon) return showWinMessage();
     };
 
     const showWinMessage = () => {
