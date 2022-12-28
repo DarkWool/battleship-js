@@ -1,6 +1,5 @@
 function ship(length) {
     let hits = 0;
-    let sunk = false;
 
     return {
         hits,
@@ -9,14 +8,11 @@ function ship(length) {
             return this.hits;
         },
         isSunk() {
-            if (this.hits >= length) {
-                sunk = true;
-                return true;
-            }
+            if (this.hits >= length) return true;
 
             return false;
         }
-    }
+    };
 }
 
 export {
