@@ -39,18 +39,118 @@ body {
   min-height: 100vh;
   height: 100%;
   background-color: rgb(3, 21, 49);
+  background-color: hsl(212, 76%, 9%);
   font-family: Heebo, sans-serif;
   font-size: 1.6rem;
   line-height: 1.2;
   color: white;
 }
 
-h1 {
-  color: white;
-  font-size: 64px;
+h1, h2 {
   line-height: 1;
 }
 
+h1 {
+  color: white;
+  font-size: 5rem;
+  font-weight: 800;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+p + p {
+  margin-top: 15px;
+}
+
+
+
+
+/* ----- Placement screen ----- */
+.game_placement {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: auto;
+  gap: 75px;
+}
+
+/* Board section */
+.placement_board {
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+}
+
+/* Ships section */
+.placement_ships > * {
+  margin-bottom: 20px;
+}
+
+.ships_actions {
+  display: flex;
+  gap: 20px;
+}
+
+.ships_actions > button {
+  flex-grow: 1;
+}
+
+.ships_available {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ships_available.vertical {
+  flex-direction: row;
+}
+
+/* Ships */
+.ship {
+  display: grid;
+  grid-auto-flow: column;
+  outline: 2px solid hsl(186, 100%, 50%);
+  position: relative;
+  z-index: 2;
+}
+
+.ship-placed {
+  width: 48px;
+  height: 48px;
+}
+
+.ship.vertical {
+  /* flex-direction: column; */
+  grid-auto-flow: row;
+}
+
+.ship > div {
+  width: 48px;
+  height: 48px;
+  background-color: hsl(208.3, 59.2%, 52.9%);
+}
+
+/* Dragging classes */
+.draggable {
+  cursor: move;
+}
+
+.draggable.dragging {
+  opacity: 0.5;
+}
+
+.board_box.selected {
+  background-color: rgb(0, 217, 255);
+}
+
+
+
+
+/* ----- Game screen ----- */
 .game {
   display: flex;
   height: 100%;
@@ -78,6 +178,10 @@ h1 {
   margin-top: 50px;
 }
 
+
+
+
+/* ----- Board ----- */
 .board {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -88,6 +192,11 @@ h1 {
   counter-reset: numberCoords letterCoords;
 }
 
+.board_box {
+  width: 48px;
+  height: 48px;
+}
+
 .board.enemy {
   background-color: hsl(0, 88%, 10%);
   border: 2px solid hsl(0, 96%, 40%);
@@ -95,14 +204,15 @@ h1 {
 
 .board.enemy > div {
   border: 1px solid rgba(71, 11, 11, 0.85);
+  cursor: pointer;
 }
 
 .board > div {
   border: 1px solid hsl(216.3, 72.9%, 18%);
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center; */
+  /* justify-content: center; */
   transition: 0.25s background-color, 0.25s border ease;
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
@@ -134,8 +244,13 @@ h1 {
   counter-increment: letterCoords;
 }
 
+.board.enemy > .hit:hover,
+.board.enemy > .not-available:hover {
+  background-color: rgba(128, 62, 62, 0.54);
+  border: 1px solid hsl(0, 62%, 75%);
+}
+
 .board.enemy > div:hover {
-  cursor: pointer;
   background-color: hsla(211, 52%, 33.5%, 0.54);
   border: 1px solid hsl(200, 93%, 48%);
 }
@@ -219,12 +334,34 @@ button {
   background-color: var(--accent);
 }
 
+.primary-btn {
+  background-color: var(--accent);
+  color: white;
+  padding: 15px 30px;
+  font-weight: 800;
+  border-radius: 2px;
+}
+
+.secondary-btn {
+  background-color: transparent;
+  color: var(--accent);
+  padding: 15px 30px;
+  font-weight: 800;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+}
+
 
 
 
 /* ----- Utilities ----- */
+.body-flex {
+  display: flex;
+}
+
 .content-margin {
-  margin: 0 auto;
+  margin-right: auto;
+  margin-left: auto;
   max-width: 1400px;
   padding-left: 25px;
   padding-right: 25px;
