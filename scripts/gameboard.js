@@ -9,21 +9,51 @@ function gameboard() {
         board.push(row);
     }
 
-    function placeShip(coords, length) {
+    function placeShip(coords, length, axis) {
+        const isHorizontal = (axis === "horiz") ? true : false;
+        if (canShipBePlaced(coords, length, isHorizontal) === false) return false;
+        
         const [coordY, coordX] = coords;
-        if (!board[coordY]) return false;
-
-        // Check if the new ship coords are not yet taken by another ship or outside the board's bounds
-        for (let i = 0; i < length; i++) {
-            const box = board[coordY][coordX + i];
-            if (typeof box === "number" || box == undefined) return false;
-        }
-
         // Create and place the new ship
         const newShip = ship(length);
         const newShipIndex = ships.push(newShip) - 1;
+
         for (let i = 0; i < length; i++) {
-            board[coordY][coordX + i] = newShipIndex;
+            if (isHorizontal) {
+                board[coordY][coordX + i] = newShipIndex;
+            } else {
+                board[coordY + i][coordX] = newShipIndex;
+            }
+        }
+
+        return true;
+    }
+
+    function canShipBePlaced(coords, shipLen, isHorizontal) {
+        const boardLen = board.length - 1;
+
+        if (shipLen <= 0 ||
+            (isHorizontal && (coords[1] + (shipLen - 1) > boardLen)) ||
+            (!isHorizontal && (coords[0] + (shipLen - 1) > boardLen))) {
+            return false;
+        } else if (coords.every(coord => (coord >= 0 && coord <= boardLen)) === false) return false;
+
+        // Check if the new ship coords are not taken by another ship 
+        // or are outside the board's bounds
+        let y = coords[0] - 1;
+        let x = coords[1] - 1;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < shipLen + 2; j++) {
+                try {
+                    const box = (isHorizontal) ?
+                        board[y + i][x + j] :
+                        board[y + j][x + i];
+                    
+                    if (typeof box === "number") return false;
+                } catch {
+                    continue;
+                }
+            }
         }
     }
 
@@ -48,17 +78,18 @@ function gameboard() {
     
     const getBoard = () => board;
 
-    function isBoxAvailable(coords) {
+    function isBoxAttacked(coords) {
         const box = board[coords[0]][coords[1]];
-        return (box !== "/" && box !== "X") ? true : false;
+        return (box === "/" || box === "X") ? true : false;
     }
 
     return {
         getBoard,
         placeShip,
+        canShipBePlaced,
         receiveAttack,
         areAllShipsSunk,
-        isBoxAvailable,
+        isBoxAttacked,
     };
 }
 

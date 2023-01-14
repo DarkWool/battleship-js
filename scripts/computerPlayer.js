@@ -7,7 +7,7 @@ function computerPlayer(name = "PC", gameboard) {
         let coords;
         do {
             coords = getRandomCoords(9);
-        } while (enemyBoard.isBoxAvailable(coords) === false);
+        } while (enemyBoard.isBoxAttacked(coords) === true);
 
         lastCoords = coords;
         return enemyBoard.receiveAttack(coords);

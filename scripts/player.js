@@ -1,6 +1,6 @@
 function player(name, gameboard) {
     const attack = (enemyBoard, coords) => {
-        if (enemyBoard.isBoxAvailable(coords)) return enemyBoard.receiveAttack(coords);
+        if (enemyBoard.isBoxAttacked(coords) === false) return enemyBoard.receiveAttack(coords);
     };
 
     return {

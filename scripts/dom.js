@@ -112,6 +112,26 @@ function placementScreen() {
         board.addEventListener("dragleave", e => {
             e.target.classList.remove("selected");
         });
+
+        board.addEventListener("drop", e => {
+            e.target.classList.remove("selected");
+            if (e.target === e.currentTarget) return;
+            console.log(e);
+
+            // Get coords
+            const coordY = +e.target.dataset.row;
+            const coordX = +e.target.dataset.col;
+
+            // Get all the info of the ship that is trying to be placed
+            // const shipId = +e.dataTransfer.getData("shipId");
+            const shipLen = +e.dataTransfer.getData("shipLen");
+            const shipAxis = e.dataTransfer.getData("shipAxis");
+            const canBePlaced = playerBoard.placeShip([coordY, coordX], shipLen, shipAxis);
+            if (canBePlaced === false) return;
+
+            const draggable = document.getElementsByClassName("dragging")[0];
+            e.target.append(draggable);
+        });
     } 
 
     function renderShip(shipLen, axis = HORIZONTAL) {
