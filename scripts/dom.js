@@ -114,21 +114,29 @@ function placementScreen() {
         });
 
         board.addEventListener("drop", e => {
+            e.preventDefault();
+
             e.target.classList.remove("selected");
             if (e.target === e.currentTarget) return;
-            console.log(e);
-
-            // Get coords
-            const coordY = +e.target.dataset.row;
-            const coordX = +e.target.dataset.col;
-
-            // Get all the info of the ship that is trying to be placed
-            // const shipId = +e.dataTransfer.getData("shipId");
+            
+            // Coords where the ship you are trying to place was
+            // (when the ship was already placed)
+            const shipSourceCoords = [
+                +e.dataTransfer.getData("sourceCoordY"),
+                +e.dataTransfer.getData("sourceCoordX")
+            ];
+            if (shipSourceCoords.every(coord => typeof coord === "number" && !isNaN(coord))) playerBoard.removeShip(shipSourceCoords);
+            
+            const newCoordY = +e.target.dataset.row;
+            const newCoordX = +e.target.dataset.col;
             const shipLen = +e.dataTransfer.getData("shipLen");
             const shipAxis = e.dataTransfer.getData("shipAxis");
-            const canBePlaced = playerBoard.placeShip([coordY, coordX], shipLen, shipAxis);
-            if (canBePlaced === false) return;
-
+            const canBePlaced = playerBoard.placeShip([newCoordY, newCoordX], shipLen, shipAxis);
+            if (canBePlaced === false) {
+                playerBoard.placeShip(shipSourceCoords, shipLen, shipAxis);
+                return;
+            };
+            
             const draggable = document.getElementsByClassName("dragging")[0];
             e.target.append(draggable);
         });
@@ -149,11 +157,16 @@ function placementScreen() {
 
         ship.addEventListener("dragstart", e => {
             ship.classList.add("dragging");
-            e.dataTransfer.setData("shipLen", shipLen);
 
+            const box = e.target.parentNode;
+            e.dataTransfer.setData("sourceCoordY", box.dataset.row);
+            e.dataTransfer.setData("sourceCoordX", box.dataset.col);
+
+            e.dataTransfer.setData("shipLen", shipLen);
             (e.currentTarget.classList.contains("vertical")) ?
                 e.dataTransfer.setData("shipAxis", VERTICAL) :
                 e.dataTransfer.setData("shipAxis", HORIZONTAL);
+            e.dataTransfer.effectAllowed = "move";
         });
 
         ship.addEventListener("dragend", () => {

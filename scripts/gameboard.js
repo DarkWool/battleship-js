@@ -13,16 +13,16 @@ function gameboard() {
         const isHorizontal = (axis === "horiz") ? true : false;
         if (canShipBePlaced(coords, length, isHorizontal) === false) return false;
         
-        const [coordY, coordX] = coords;
-        // Create and place the new ship
         const newShip = ship(length);
-        const newShipIndex = ships.push(newShip) - 1;
-
+        ships.push(newShip);
+        
+        // Place ship
+        const [coordY, coordX] = coords;
         for (let i = 0; i < length; i++) {
             if (isHorizontal) {
-                board[coordY][coordX + i] = newShipIndex;
+                board[coordY][coordX + i] = newShip;
             } else {
-                board[coordY + i][coordX] = newShipIndex;
+                board[coordY + i][coordX] = newShip;
             }
         }
 
@@ -49,7 +49,7 @@ function gameboard() {
                         board[y + i][x + j] :
                         board[y + j][x + i];
                     
-                    if (typeof box === "number") return false;
+                    if (typeof box === "object") return false;
                 } catch {
                     continue;
                 }
@@ -57,13 +57,23 @@ function gameboard() {
         }
     }
 
+    function removeShip(coords) {
+        const shipToRemove = board[coords[0]][coords[1]];
+        
+        board.forEach((row, rowIndex) => {
+            row.forEach((box, boxIndex) => {
+                if (box === shipToRemove) board[rowIndex][boxIndex] = "";
+            });
+        });
+    }
+
     function receiveAttack(coords) {
         const [coordY, coordX] = coords;
 
         // If you find a number on the given coords then a ship will be hit!
-        if (typeof board[coordY][coordX] === "number") {
-            const index = board[coordY][coordX];
-            ships[index].hit();
+        if (typeof board[coordY][coordX] === "object") {
+            const ship = board[coordY][coordX];
+            ship.hit();
             board[coordY][coordX] = "X";
             
             return true;
@@ -87,6 +97,7 @@ function gameboard() {
         getBoard,
         placeShip,
         canShipBePlaced,
+        removeShip,
         receiveAttack,
         areAllShipsSunk,
         isBoxAttacked,

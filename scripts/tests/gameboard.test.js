@@ -50,24 +50,17 @@ describe("placeShip()", () => {
         expect(board.placeShip([7, 9], 3, "vert")).toBe(true);
     });
 
-    test("Places a number on the board representing the index of the new ship", () => {
+    test("Places a ship object on the board coords", () => {
         board.placeShip([0, 0], 3, "horiz");
         board.placeShip([5, 4], 4, "vert");
 
-        expect(typeof testBoard[0][0]).toBe("number");
-        expect(typeof testBoard[0][1]).toBe("number");
-        expect(typeof testBoard[0][2]).toBe("number");
-        expect(testBoard[0][0]).toEqual(0);
-        expect(testBoard[0][1]).toEqual(0);
-        expect(testBoard[0][2]).toEqual(0);
-        expect(typeof testBoard[5][4]).toBe("number");
-        expect(typeof testBoard[6][4]).toBe("number");
-        expect(typeof testBoard[7][4]).toBe("number");
-        expect(typeof testBoard[8][4]).toBe("number");
-        expect(testBoard[5][4]).toEqual(1);
-        expect(testBoard[6][4]).toEqual(1);
-        expect(testBoard[7][4]).toEqual(1);
-        expect(testBoard[8][4]).toEqual(1);
+        expect(typeof testBoard[0][0]).toBe("object");
+        expect(typeof testBoard[0][1]).toBe("object");
+        expect(typeof testBoard[0][2]).toBe("object");
+        expect(typeof testBoard[5][4]).toBe("object");
+        expect(typeof testBoard[6][4]).toBe("object");
+        expect(typeof testBoard[7][4]).toBe("object");
+        expect(typeof testBoard[8][4]).toBe("object");
     });
 });
 
@@ -194,6 +187,37 @@ describe("receiveAttack()", () => {
         expect(board.receiveAttack([3, 9])).toBe(true);
         expect(board.receiveAttack([0, 0])).toBe(true);
         expect(board.receiveAttack([1, 0])).toBe(true);
+    });
+});
+
+describe("removeShip()", () => {
+    beforeAll(() => {
+        board = gameboard();
+        testBoard = board.getBoard();
+        board.placeShip([0, 0], 5, "vert");
+        board.placeShip([2, 6], 2, "vert");
+        board.placeShip([7, 3], 5, "horiz");
+    });
+
+    test("Removes a ship from the board", () => {
+        board.removeShip([0, 0]);
+        board.removeShip([2, 6]);
+        board.removeShip([7, 3]);
+
+        expect(testBoard[0][0]).toBe("");
+        expect(testBoard[0][1]).toBe("");
+        expect(testBoard[0][2]).toBe("");
+        expect(testBoard[0][3]).toBe("");
+        expect(testBoard[0][4]).toBe("");
+        
+        expect(testBoard[2][6]).toBe("");
+        expect(testBoard[3][6]).toBe("");
+
+        expect(testBoard[7][3]).toBe("");
+        expect(testBoard[7][4]).toBe("");
+        expect(testBoard[7][5]).toBe("");
+        expect(testBoard[7][6]).toBe("");
+        expect(testBoard[7][7]).toBe("");
     });
 });
 
