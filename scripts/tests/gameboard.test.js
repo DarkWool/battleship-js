@@ -253,6 +253,52 @@ describe("isBoxAttacked()", () => {
     });
 });
 
+describe("randomize()", () => {
+    beforeAll(() => {
+        board = gameboard();
+        testBoard = board.getBoard();
+    });
+
+    test("Places a new ship on the board for every element in the array", () => {
+        const shipsToPlace = [5, 4, 3, 3, 2];
+        const shipsFound = [];
+        board.randomize(shipsToPlace);
+
+        for (const row of testBoard) {
+            for (const box of row) {
+                if (typeof box === "object" && shipsFound.indexOf(box) === -1) {
+                    shipsFound.push(box);
+                }
+            }
+        }
+
+        expect(shipsFound).toHaveLength(shipsToPlace.length);
+    });
+
+    test("Places ships with lengths matching the elements in the input array", () => {
+        const shipsToPlace = [5, 4, 3, 3, 2];
+        const shipsFound = [];
+        board.randomize(shipsToPlace);
+
+        for (const row of testBoard) {
+            for (const box of row) {
+                if (typeof box === "object" && shipsFound.indexOf(box) === -1) {
+                    shipsFound.push(box);
+                }
+            }
+        }
+
+        for (const ship of shipsFound) {
+            const index = shipsToPlace.indexOf(ship.length);
+            expect(index).not.toEqual(-1);
+
+            shipsToPlace.splice(index, 1);
+        }
+
+        expect(shipsToPlace).toHaveLength(0);
+    });
+});
+
 describe("areAllShipsSunk()", () => {
     beforeAll(() => {
         board = gameboard();

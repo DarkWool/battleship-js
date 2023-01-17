@@ -2,11 +2,20 @@ import { ship } from "./ship.js";
 
 function gameboard() {
     const board = [];
-    const ships = [];
+    let ships = [];
     
     for (let i = 0; i < 10; i++) {
         const row = Array.from({ length: 10 }, (x) => "");
         board.push(row);
+    }
+
+    function reset() {
+        ships = [];
+        board.forEach((row, rowIndex) => {
+            row.forEach((col, colIndex) => {
+                board[rowIndex][colIndex] = "";
+            });
+        });
     }
 
     function placeShip(coords, length, axis) {
@@ -70,7 +79,6 @@ function gameboard() {
     function receiveAttack(coords) {
         const [coordY, coordX] = coords;
 
-        // If you find a number on the given coords then a ship will be hit!
         if (typeof board[coordY][coordX] === "object") {
             const ship = board[coordY][coordX];
             ship.hit();
@@ -82,6 +90,21 @@ function gameboard() {
         // Record a missed shot on the board
         board[coordY][coordX] = "/";
         return false;
+    }
+
+    function randomize(ships) {
+        reset();
+
+        const boardLen = board.length;
+        ships.forEach(shipLen => {
+            let coordX, coordY, axis;
+
+            do {
+                coordY = Math.floor(Math.random() * (boardLen + 1));
+                coordX = Math.floor(Math.random() * (boardLen + 1));
+                axis = (Math.random() > 0.5) ? "horiz" : "vert";
+            } while (placeShip([coordY, coordX], shipLen, axis) === false);
+        });
     }
 
     const areAllShipsSunk = () => ships.every(ship => ship.isSunk());
@@ -100,6 +123,7 @@ function gameboard() {
         removeShip,
         receiveAttack,
         areAllShipsSunk,
+        randomize,
         isBoxAttacked,
     };
 }

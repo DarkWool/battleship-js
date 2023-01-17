@@ -1,14 +1,44 @@
 import { ship } from "../ship.js";
 
-let testShip = new ship(5);
+let testShip = ship(5);
 
-describe("Hits property", () => {
+describe("hits property", () => {
     test("Ships should have a 'hits' property", () => {
         expect(testShip).toHaveProperty("hits");
     });
     
     test("Initial value is zero", () => {
         expect(testShip.hits).toEqual(0);
+    });
+});
+
+describe("length property", () => {
+    test("Ships should have a 'length' property", () => {
+        expect(testShip).toHaveProperty("length");
+    });
+
+    test("Length property must be a number", () => {
+        for (let i = 1; i < 8; i++) {
+            const shipLen = i;
+            testShip = ship(shipLen);
+            expect(typeof testShip.length).toEqual("number");
+        }
+    });
+
+    test("Length property must be greater than zero", () => {
+        expect(ship(0)).toBeFalsy();
+        expect(ship(-10)).toBeFalsy();
+        expect(ship(-1000)).toBeFalsy();
+    });
+
+    test("When creating a new ship if the length property is NOT a number it shouldn't return an object", () => {
+        expect(ship("5")).toBeFalsy();
+        expect(ship(null)).toBeFalsy();
+        expect(ship(undefined)).toBeFalsy();
+        expect(ship(NaN)).toBeFalsy();
+        expect(ship([5])).toBeFalsy();
+        expect(ship({0: 1})).toBeFalsy();
+        expect(ship(true)).toBeFalsy();
     });
 });
 

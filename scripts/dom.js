@@ -1,5 +1,6 @@
 import { gameController } from "./gameController.js";
 import { gameboard } from "./gameboard.js";
+import { isNumber } from "./utils.js";
 
 const HORIZONTAL = "horiz";
 const VERTICAL = "vert";
@@ -28,11 +29,13 @@ function placementScreen() {
         const shipsTitle = document.createElement("h2");
         const shipsBtns = document.createElement("div");
         const changeAxisBtn = document.createElement("button");
+        const randomizeBtn = document.createElement("button");
         const availableShips = document.createElement("div");
 
         instructionsTitle.textContent = "Instructions";
         shipsTitle.textContent = "Ships available";
         changeAxisBtn.textContent = "Change Axis";
+        randomizeBtn.textContent = "Randomize";
         changeAxisBtn.type = "button";
         instructionsContainer.insertAdjacentHTML(
           "afterbegin",
@@ -62,18 +65,20 @@ function placementScreen() {
         shipsBtns.classList.add("ships_actions");
         availableShips.classList.add("ships_available");
         changeAxisBtn.classList.add("primary-btn");
+        randomizeBtn.classList.add("secondary-btn");
 
         // Listeners
-        changeAxisBtn.addEventListener("click", changeShipsAxis);
         attachBoardListeners(boardContainer);
+        changeAxisBtn.addEventListener("click", changeShipsAxis);
+        randomizeBtn.addEventListener("click", randomizeShipsPositions);
         for (const shipLen of playerShips) {
             const ship = renderShip(shipLen);
             availableShips.append(ship);
-        }
+        };
 
         boardContainer.append(renderPlacementBoard());
         instructionsContainer.prepend(instructionsTitle);
-        shipsBtns.append(changeAxisBtn);
+        shipsBtns.append(changeAxisBtn, randomizeBtn);
         shipsSection.append(shipsTitle, shipsBtns, availableShips);
         placementSection.append(instructionsContainer, boardContainer, shipsSection);
 
@@ -91,7 +96,15 @@ function placementScreen() {
                 div.classList.add("board_box");
                 div.dataset.row = rowIndex;
                 div.dataset.col = colIndex;
-                div.textContent = box;
+
+                if (typeof box === "object" && shipsRendered.indexOf(box) === -1) {
+                    shipsRendered.push(box);
+                    const ship = (board[rowIndex][colIndex + 1] === box) ?
+                        renderShip(box.length, HORIZONTAL) :
+                        renderShip(box.length, VERTICAL);
+            
+                    div.append(ship);
+                }
 
                 fragment.append(div);
             });
@@ -125,7 +138,7 @@ function placementScreen() {
                 +e.dataTransfer.getData("sourceCoordY"),
                 +e.dataTransfer.getData("sourceCoordX")
             ];
-            if (shipSourceCoords.every(coord => typeof coord === "number" && !isNaN(coord))) playerBoard.removeShip(shipSourceCoords);
+            if (shipSourceCoords.every(coord => isNumber(coord))) playerBoard.removeShip(shipSourceCoords);
             
             const newCoordY = +e.target.dataset.row;
             const newCoordX = +e.target.dataset.col;
@@ -194,6 +207,15 @@ function placementScreen() {
         for (const ship of ships) {
             ship.classList.remove("vertical");
         }
+    }
+
+    function randomizeShipsPositions() {
+        playerBoard.randomize(playerShips);
+        const newBoard = renderPlacementBoard();
+
+        availableShips.innerHTML = "";
+        placementBoard.innerHTML = "";
+        placementBoard.append(newBoard);
     }
 }
 
