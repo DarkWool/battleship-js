@@ -1,9 +1,6 @@
 import { gameController } from "./gameController.js";
 import { gameboard } from "./gameboard.js";
-import { isNumber } from "./utils.js";
-
-const HORIZONTAL = "horiz";
-const VERTICAL = "vert";
+import { HORIZONTAL, VERTICAL, isNumber } from "./utils.js";
 
 function placementScreen() {
     const playerBoard = gameboard();
@@ -99,10 +96,7 @@ function placementScreen() {
 
                 if (typeof box === "object" && shipsRendered.indexOf(box) === -1) {
                     shipsRendered.push(box);
-                    const ship = (board[rowIndex][colIndex + 1] === box) ?
-                        renderShip(box.length, HORIZONTAL) :
-                        renderShip(box.length, VERTICAL);
-            
+                    const ship = renderShip(box.length, box.axis);
                     div.append(ship);
                 }
 
@@ -184,6 +178,25 @@ function placementScreen() {
 
         ship.addEventListener("dragend", () => {
             ship.classList.remove("dragging");
+        });
+
+        ship.addEventListener("dblclick", e => {
+            if (!e.currentTarget.closest(".board")) return;
+            
+            const parent = e.currentTarget.parentNode;
+            const coords = [+parent.dataset.row, +parent.dataset.col];
+            
+            const ship = playerBoard.getBoxAt(coords);
+            const shipLen = ship.length;
+            const currAxis = ship.axis;
+            const newAxis = (currAxis === HORIZONTAL) ? VERTICAL : HORIZONTAL;
+
+            playerBoard.removeShip(coords);
+
+            const canBePlaced = playerBoard.placeShip(coords, shipLen, newAxis);
+            (!canBePlaced) ?
+                playerBoard.placeShip(coords, shipLen, currAxis) :
+                e.currentTarget.classList.toggle("vertical");
         });
 
         return ship;

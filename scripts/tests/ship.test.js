@@ -1,6 +1,7 @@
 import { ship } from "../ship.js";
+import { HORIZONTAL } from "../utils.js";
 
-let testShip = ship(5);
+let testShip = ship(5, HORIZONTAL);
 
 describe("hits property", () => {
     test("Ships should have a 'hits' property", () => {
@@ -17,7 +18,7 @@ describe("length property", () => {
         expect(testShip).toHaveProperty("length");
     });
 
-    test("Length property must be a number", () => {
+    test("Must be a number", () => {
         for (let i = 1; i < 8; i++) {
             const shipLen = i;
             testShip = ship(shipLen);
@@ -25,7 +26,7 @@ describe("length property", () => {
         }
     });
 
-    test("Length property must be greater than zero", () => {
+    test("Must be greater than zero", () => {
         expect(ship(0)).toBeFalsy();
         expect(ship(-10)).toBeFalsy();
         expect(ship(-1000)).toBeFalsy();
@@ -39,6 +40,16 @@ describe("length property", () => {
         expect(ship([5])).toBeFalsy();
         expect(ship({0: 1})).toBeFalsy();
         expect(ship(true)).toBeFalsy();
+    });
+});
+
+describe("axis property", () => {
+    test("Ships must have an 'axis' property", () => {
+        expect(testShip).toHaveProperty("axis");
+    });
+
+    test("Must be a string", () => {
+        expect(typeof testShip.axis).toBe("string");
     });
 });
 

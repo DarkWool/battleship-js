@@ -1,3 +1,4 @@
+import { HORIZONTAL } from "./utils.js";
 import { ship } from "./ship.js";
 
 function gameboard() {
@@ -19,10 +20,10 @@ function gameboard() {
     }
 
     function placeShip(coords, length, axis) {
-        const isHorizontal = (axis === "horiz") ? true : false;
+        const isHorizontal = (axis === HORIZONTAL) ? true : false;
         if (canShipBePlaced(coords, length, isHorizontal) === false) return false;
         
-        const newShip = ship(length);
+        const newShip = ship(length, axis);
         ships.push(newShip);
         
         // Place ship
@@ -45,7 +46,7 @@ function gameboard() {
             (isHorizontal && (coords[1] + (shipLen - 1) > boardLen)) ||
             (!isHorizontal && (coords[0] + (shipLen - 1) > boardLen))) {
             return false;
-        } else if (coords.every(coord => (coord >= 0 && coord <= boardLen)) === false) return false;
+        } else if (!coords.every(coord => coord >= 0 && coord <= boardLen)) return false;
 
         // Check if the new ship coords are not taken by another ship 
         // or are outside the board's bounds
@@ -68,12 +69,13 @@ function gameboard() {
 
     function removeShip(coords) {
         const shipToRemove = board[coords[0]][coords[1]];
-        
         board.forEach((row, rowIndex) => {
             row.forEach((box, boxIndex) => {
                 if (box === shipToRemove) board[rowIndex][boxIndex] = "";
             });
         });
+
+        ships.splice(ships.indexOf(shipToRemove), 1);
     }
 
     function receiveAttack(coords) {
@@ -111,6 +113,8 @@ function gameboard() {
     
     const getBoard = () => board;
 
+    const getBoxAt = coords => board[coords[0]][coords[1]];
+
     function isBoxAttacked(coords) {
         const box = board[coords[0]][coords[1]];
         return (box === "/" || box === "X") ? true : false;
@@ -118,6 +122,7 @@ function gameboard() {
 
     return {
         getBoard,
+        getBoxAt,
         placeShip,
         canShipBePlaced,
         removeShip,

@@ -190,6 +190,19 @@ describe("receiveAttack()", () => {
     });
 });
 
+describe("getBoxAt()", () => {
+    test("Returns the value of the box at the input coords", () => {
+        board.placeShip([4, 4], 2, "horiz");
+
+        expect(board.getBoxAt([0, 1])).toBe("");
+        expect(board.getBoxAt([0, 2])).toBe("");
+        expect(board.getBoxAt([7, 3])).toBe("");
+        expect(board.getBoxAt([8, 9])).toBe("");
+        expect(typeof board.getBoxAt([4, 4])).toBe("object");
+        expect(typeof board.getBoxAt([4, 5])).toBe("object");
+    });
+});
+
 describe("removeShip()", () => {
     beforeAll(() => {
         board = gameboard();
@@ -198,7 +211,7 @@ describe("removeShip()", () => {
         board.placeShip([2, 6], 2, "vert");
         board.placeShip([7, 3], 5, "horiz");
     });
-
+    
     test("Removes a ship from the board", () => {
         board.removeShip([0, 0]);
         board.removeShip([2, 6]);

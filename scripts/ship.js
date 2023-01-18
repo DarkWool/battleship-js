@@ -1,6 +1,6 @@
-import { isNumber } from "./utils.js";
+import { HORIZONTAL, isNumber } from "./utils.js";
 
-function ship(_length) {
+function ship(_length, _axis = HORIZONTAL) {
     if (!isNumber(_length) || _length <= 0) return;
 
     let hits = 0;
@@ -9,6 +9,9 @@ function ship(_length) {
         hits,
         get length() {
             return _length;
+        },
+        get axis() {
+            return _axis;
         },
         hit() {
             this.hits++;
