@@ -126,26 +126,30 @@ function placementScreen() {
             e.target.classList.remove("selected");
             if (e.target === e.currentTarget) return;
             
-            // Coords where the ship you are trying to place was
-            // (when the ship was already placed)
-            const shipSourceCoords = [
+            const sourceCoords = [
                 +e.dataTransfer.getData("sourceCoordY"),
                 +e.dataTransfer.getData("sourceCoordX")
             ];
-            if (shipSourceCoords.every(coord => isNumber(coord))) playerBoard.removeShip(shipSourceCoords);
+            if (sourceCoords.every(coord => isNumber(coord))) playerBoard.removeShip(sourceCoords);
             
-            const newCoordY = +e.target.dataset.row;
-            const newCoordX = +e.target.dataset.col;
             const shipLen = +e.dataTransfer.getData("shipLen");
             const shipAxis = e.dataTransfer.getData("shipAxis");
-            const canBePlaced = playerBoard.placeShip([newCoordY, newCoordX], shipLen, shipAxis);
-            if (canBePlaced === false) {
-                playerBoard.placeShip(shipSourceCoords, shipLen, shipAxis);
-                return;
-            };
+            const offset = +e.dataTransfer.getData("offset");
+            const newCoords = [+e.target.dataset.row, +e.target.dataset.col];
+            (shipAxis === HORIZONTAL) ?
+                newCoords[1] -= offset :
+                newCoords[0] -= offset;
             
-            const draggable = document.getElementsByClassName("dragging")[0];
-            e.target.append(draggable);
+            const canBePlaced = playerBoard.placeShip(newCoords, shipLen, shipAxis);
+            if (canBePlaced) {
+                const newLocation = document.querySelector(`[data-row='${newCoords[0]}'][data-col='${newCoords[1]}']`);
+                const draggable = document.getElementsByClassName("dragging")[0];
+                newLocation.append(draggable);
+                return;
+            }
+
+            // If the ship can't be placed in the new location place it again where it was
+            playerBoard.placeShip(sourceCoords, shipLen, shipAxis);
         });
     } 
 
@@ -157,8 +161,14 @@ function placementScreen() {
 
         if (axis === VERTICAL) ship.classList.add("vertical");
         
+        let offset = 0;
         for (let i = 0; i < shipLen; i++) {
             const shipSection = document.createElement("div");
+            shipSection.dataset.offset = i;
+            shipSection.addEventListener("mousedown", e => {
+                const boxOffset = e.target.dataset.offset;
+                if (boxOffset) offset = boxOffset;
+            });
             ship.append(shipSection);
         }
 
@@ -168,11 +178,11 @@ function placementScreen() {
             const box = e.target.parentNode;
             e.dataTransfer.setData("sourceCoordY", box.dataset.row);
             e.dataTransfer.setData("sourceCoordX", box.dataset.col);
-
             e.dataTransfer.setData("shipLen", shipLen);
             (e.currentTarget.classList.contains("vertical")) ?
                 e.dataTransfer.setData("shipAxis", VERTICAL) :
                 e.dataTransfer.setData("shipAxis", HORIZONTAL);
+            e.dataTransfer.setData("offset", offset);
             e.dataTransfer.effectAllowed = "move";
         });
 
@@ -182,7 +192,7 @@ function placementScreen() {
 
         ship.addEventListener("dblclick", e => {
             if (!e.currentTarget.closest(".board")) return;
-            
+
             const parent = e.currentTarget.parentNode;
             const coords = [+parent.dataset.row, +parent.dataset.col];
             
