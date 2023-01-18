@@ -6,16 +6,19 @@ function placementScreen() {
     const playerBoard = gameboard();
     const playerShips = [5, 4, 3, 3, 2];
     let axis = HORIZONTAL;
+    let placedShips = 0;
 
     document.body.innerHTML = "";
     render();
 
     const placementBoard = document.getElementsByClassName("placement_board")[0];
     const availableShips = document.getElementsByClassName("ships_available")[0];
+    const startGameBtn = document.getElementsByClassName("start-btn")[0];
 
 
     function render() {
         const placementSection = document.createElement("section");
+        const startGameSection = document.createElement("section");
 
         const instructionsContainer = document.createElement("div");
         const instructionsTitle = document.createElement("h2");
@@ -28,12 +31,17 @@ function placementScreen() {
         const changeAxisBtn = document.createElement("button");
         const randomizeBtn = document.createElement("button");
         const availableShips = document.createElement("div");
+        const startGameBtn = document.createElement("button");
 
         instructionsTitle.textContent = "Instructions";
         shipsTitle.textContent = "Ships available";
         changeAxisBtn.textContent = "Change Axis";
         randomizeBtn.textContent = "Randomize";
+        startGameBtn.textContent = "START GAME";
         changeAxisBtn.type = "button";
+        randomizeBtn.type = "button";
+        startGameBtn.type = "button";
+        startGameBtn.setAttribute("disabled", "");
         instructionsContainer.insertAdjacentHTML(
           "afterbegin",
           `<p>
@@ -55,19 +63,22 @@ function placementScreen() {
             </p>`
         );
 
-        document.body.classList.add("body-flex");
-        placementSection.classList.add("game_placement", "content-margin");
+        document.body.classList.add("body-flex", "content-margin");
+        placementSection.classList.add("game_placement");
         boardContainer.classList.add("placement_board", "board");
         shipsSection.classList.add("placement_ships");
         shipsBtns.classList.add("ships_actions");
         availableShips.classList.add("ships_available");
         changeAxisBtn.classList.add("primary-btn");
         randomizeBtn.classList.add("secondary-btn");
+        startGameSection.classList.add("game_start");
+        startGameBtn.classList.add("primary-btn", "start-btn");
 
         // Listeners
         attachBoardListeners(boardContainer);
         changeAxisBtn.addEventListener("click", changeShipsAxis);
         randomizeBtn.addEventListener("click", randomizeShipsPositions);
+        startGameBtn.addEventListener("click", startGame);
         for (const shipLen of playerShips) {
             const ship = renderShip(shipLen);
             availableShips.append(ship);
@@ -78,8 +89,9 @@ function placementScreen() {
         shipsBtns.append(changeAxisBtn, randomizeBtn);
         shipsSection.append(shipsTitle, shipsBtns, availableShips);
         placementSection.append(instructionsContainer, boardContainer, shipsSection);
+        startGameSection.append(startGameBtn);
 
-        document.body.prepend(placementSection);
+        document.body.prepend(placementSection, startGameSection);
     }
 
     function renderPlacementBoard() {
@@ -98,6 +110,8 @@ function placementScreen() {
                     shipsRendered.push(box);
                     const ship = renderShip(box.length, box.axis);
                     div.append(ship);
+
+                    placedShips++;
                 }
 
                 fragment.append(div);
@@ -145,6 +159,9 @@ function placementScreen() {
                 const newLocation = document.querySelector(`[data-row='${newCoords[0]}'][data-col='${newCoords[1]}']`);
                 const draggable = document.getElementsByClassName("dragging")[0];
                 newLocation.append(draggable);
+                
+                placedShips++;
+                checkIfGameCanStart();
                 return;
             }
 
@@ -233,12 +250,28 @@ function placementScreen() {
     }
 
     function randomizeShipsPositions() {
+        placedShips = 0;
         playerBoard.randomize(playerShips);
         const newBoard = renderPlacementBoard();
+        checkIfGameCanStart();
 
         availableShips.innerHTML = "";
         placementBoard.innerHTML = "";
         placementBoard.append(newBoard);
+    }
+
+    function startGame(e) {
+        if (!checkIfGameCanStart()) return;
+        console.log(e);
+
+        domController();
+    }
+
+    function checkIfGameCanStart() {
+        if (placedShips === playerShips.length) {
+            startGameBtn.removeAttribute("disabled");
+            return true;
+        }
     }
 }
 
@@ -252,6 +285,8 @@ function domController() {
     let isComputerTurn = false;
 
 
+    render();
+
     // DOM cache
     const gameboards = document.getElementsByClassName("game_boards")[0];
     const turn = document.getElementsByClassName("game_turn")[0];
@@ -259,6 +294,31 @@ function domController() {
     const winMessageModal = winModal.getElementsByClassName("win_msg")[0];
     const winMessageTitle = winMessageModal.getElementsByClassName("win_msg-title")[0];
     const boards = [];
+
+    function render() {
+        document.body.innerHTML = "";
+        document.body.insertAdjacentHTML("afterbegin", `
+            <section class="game content-margin">
+                <div class="game_header">
+                    <h1>Battleship Game</h1>
+                </div>
+                <div class="game_turn"></div>
+                <div class="game_boards"></div>
+                <div class="game_win-modal">
+                    <div class="dark-overlay"></div>
+                    <div class="win_msg">
+                        <h2 class="win_msg-title"></h2>
+                        <p>Want to play again?</p>
+                        <button type="button" class="restart-btn">
+                            RESTART
+                        </button>
+                        
+                        <img class="win_msg-img" src="./images/deco-ship.png" alt="A warship in the sea">
+                    </div>
+                </div>
+            </section>
+        `);
+    };
 
 
     const renderBoards = () => {
