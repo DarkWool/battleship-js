@@ -1,6 +1,7 @@
 import { HORIZONTAL } from "./utils.js";
 import { ship } from "./ship.js";
 
+
 function gameboard() {
     const board = [];
     let ships = [];
@@ -23,7 +24,10 @@ function gameboard() {
         const isHorizontal = (axis === HORIZONTAL) ? true : false;
         if (canShipBePlaced(coords, length, isHorizontal) === false) return false;
         
-        const newShip = ship(length, axis);
+        const newShip = {
+            beginningCoords: coords,
+            ship: ship(length, axis)
+        };
         ships.push(newShip);
         
         // Place ship
@@ -80,18 +84,54 @@ function gameboard() {
 
     function receiveAttack(coords) {
         const [coordY, coordX] = coords;
+        const result = { shipHit: null };
 
         if (typeof board[coordY][coordX] === "object") {
-            const ship = board[coordY][coordX];
+            const box = board[coordY][coordX];
+            const ship = box.ship;
             ship.hit();
             board[coordY][coordX] = "X";
-            
-            return true;
+
+            if (ship.isSunk()) {
+                result.adjacentCoords = attackAdjacentTiles(box.beginningCoords, ship);
+            }
+            result.shipHit = true;
+        } else {
+            // Record a missed shot on the board
+            board[coordY][coordX] = "/";
+            result.shipHit = false;
         }
         
-        // Record a missed shot on the board
-        board[coordY][coordX] = "/";
-        return false;
+        return result;
+    }
+
+    function attackAdjacentTiles(beginningCoords, ship) {
+        const boxesCoords = [];
+        const shipLen = ship.length;
+        const shipAxis = ship.axis;
+
+        let y = beginningCoords[0] - 1;
+        let x = beginningCoords[1] - 1;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < shipLen + 2; j++) {
+                try {
+                    const coords = (shipAxis === HORIZONTAL) ?
+                        [y + i, x + j] :
+                        [y + j, x + i];
+                    
+                    if (board[coords[0]][coords[1]] === "X" ||
+                        board[coords[0]][coords[1]] == null) continue;
+
+                    board[coords[0]][coords[1]] = "/";
+                    boxesCoords.push(coords);
+                } catch {
+                    continue;
+                }
+            }
+        }
+
+        // console.table(boxesCoords);
+        return boxesCoords;
     }
 
     function randomize(ships) {
@@ -109,7 +149,7 @@ function gameboard() {
         });
     }
 
-    const areAllShipsSunk = () => ships.every(ship => ship.isSunk());
+    const areAllShipsSunk = () => ships.every(obj => obj.ship.isSunk());
     
     const getBoard = () => board;
 

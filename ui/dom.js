@@ -29,8 +29,9 @@ function screenController() {
         const shipsRendered = [];
         return createBoardUI(board, ((container, box) => {
             if (typeof box === "object" && shipsRendered.indexOf(box) === -1) {
-                const ship = renderShip(box.length, box.axis, draggable);
-                container.append(ship);
+                const ship = box.ship;
+                const shipUI = renderShip(ship.length, ship.axis, draggable);
+                container.append(shipUI);
                 shipsRendered.push(box);
                 placedShips++;
             }
@@ -357,12 +358,12 @@ function screenController() {
             return createBoardUI(board, ((container, box, coords) => {
                 container.addEventListener("click", e => {
                     if (isComputerTurn) return;
-                    isComputerTurn = true;
-
+                    
                     const turn = game.playTurn(coords);
-
-                    if (turn === null) return;
-                    handleTurnResult(turn, e.currentTarget);
+                    if (!turn) return;
+                    isComputerTurn = true;
+                    
+                    handleTurnResult(turn, e.currentTarget, boards[1]);
                     e.currentTarget.classList.add("not-available");
                     
                     updateTurn();
@@ -382,17 +383,26 @@ function screenController() {
 
                 const coords = players[1].getLastCoords;
                 const boxNumber = coords[0] * 10 + coords[1];
-                handleTurnResult(turn, boards[0].children[boxNumber]);
+                handleTurnResult(turn, boards[0].children[boxNumber], boards[0]);
                 
                 updateTurn();
                 isComputerTurn = false;
             }, 1500);
         };
 
-        const handleTurnResult = (turnResult, box) => {
+        const handleTurnResult = (turnResult, box, board) => {
             box.textContent = MARKER;
 
-            if (turnResult.shipHit) box.classList.add("hit");
+            if (turnResult.shipHit) {
+                box.classList.add("hit");
+                if (turnResult.adjacentCoords) {
+                    turnResult.adjacentCoords.forEach(coords => {
+                        const box = board.querySelector(`[data-row="${coords[0]}"][data-col="${coords[1]}"]`);
+                        box.textContent = MARKER;
+                        box.classList.add("not-available");
+                    });
+                }
+            }
             if (turnResult.isGameWon) return showWinMessage();
         };
 

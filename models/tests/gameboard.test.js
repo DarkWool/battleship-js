@@ -136,7 +136,7 @@ describe("canShipBePlaced()", () => {
 });
 
 describe("receiveAttack()", () => {
-    beforeEach(() => {
+    beforeAll(() => {
         board = gameboard();
         testBoard = board.getBoard();
         board.placeShip([3, 6], 4, "horiz");
@@ -160,37 +160,72 @@ describe("receiveAttack()", () => {
     test("Registers a shot to a ship on the board", () => {
         board.receiveAttack([3, 6]);
         board.receiveAttack([3, 7]);
-        board.receiveAttack([3, 8]);
         board.receiveAttack([3, 9]);
         board.receiveAttack([0, 0]);
-        board.receiveAttack([1, 0]);
-    
+        
         expect(testBoard[3][6]).toBe("X");
         expect(testBoard[3][7]).toBe("X");
-        expect(testBoard[3][8]).toBe("X");
         expect(testBoard[3][9]).toBe("X");
         expect(testBoard[0][0]).toBe("X");
-        expect(testBoard[1][0]).toBe("X");
+    });
+    
+    test(`When the attack sunk a ship it registers a shot to each one 
+    of the adjacent boxes to the ship`, () => {
+        board.receiveAttack([3, 8]);
+        board.receiveAttack([1, 0]);
+
+        expect(testBoard[2][5]).toBe("/");
+        expect(testBoard[2][6]).toBe("/");
+        expect(testBoard[2][7]).toBe("/");
+        expect(testBoard[2][8]).toBe("/");
+        expect(testBoard[2][9]).toBe("/");
+        expect(testBoard[3][5]).toBe("/");
+        expect(testBoard[4][5]).toBe("/");
+        expect(testBoard[4][6]).toBe("/");
+        expect(testBoard[4][7]).toBe("/");
+        expect(testBoard[4][8]).toBe("/");
+        expect(testBoard[4][9]).toBe("/");
+
+        expect(testBoard[0][1]).toBe("/");
+        expect(testBoard[1][1]).toBe("/");
+        expect(testBoard[2][0]).toBe("/");
+        expect(testBoard[2][1]).toBe("/");
     });
 
-    test("Returns false for a miss shot", () => {
-        expect(board.receiveAttack([6, 6])).toBe(false);
-        expect(board.receiveAttack([2, 0])).toBe(false);
-        expect(board.receiveAttack([1, 8])).toBe(false);
-        expect(board.receiveAttack([8, 1])).toBe(false);
-        expect(board.receiveAttack([9, 0])).toBe(false);
-    });
+    describe("Returns an object with the following properties", () => {
+        beforeAll(() => {
+            board = gameboard();
+            testBoard = board.getBoard();
+            board.placeShip([3, 6], 4, "horiz");
+            board.placeShip([0, 0], 2, "vert");
+        });
 
-    test("Returns true when a ship is hit", () => {
-        expect(board.receiveAttack([3, 6])).toBe(true);
-        expect(board.receiveAttack([3, 7])).toBe(true);
-        expect(board.receiveAttack([3, 9])).toBe(true);
-        expect(board.receiveAttack([0, 0])).toBe(true);
-        expect(board.receiveAttack([1, 0])).toBe(true);
+        test("'shipHit' prop value is false for a missed shot", () => {
+            const response = { shipHit: false };
+            expect(board.receiveAttack([6, 6])).toMatchObject(response);
+            expect(board.receiveAttack([2, 0])).toMatchObject(response);
+            expect(board.receiveAttack([1, 8])).toMatchObject(response);
+            expect(board.receiveAttack([8, 1])).toMatchObject(response);
+            expect(board.receiveAttack([9, 0])).toMatchObject(response);
+        });
+    
+        test("'shipHit' prop value is true when a ship is hit", () => {
+            const response = { shipHit: true };
+            expect(board.receiveAttack([3, 6])).toMatchObject(response);
+            expect(board.receiveAttack([3, 7])).toMatchObject(response);
+            expect(board.receiveAttack([3, 9])).toMatchObject(response);
+            expect(board.receiveAttack([0, 0])).toMatchObject(response);
+            expect(board.receiveAttack([1, 0])).toMatchObject(response);
+        });
     });
 });
 
 describe("getBoxAt()", () => {
+    beforeEach(() => {
+        board = gameboard();
+        testBoard = board.getBoard();
+    });
+
     test("Returns the value of the box at the input coords", () => {
         board.placeShip([4, 4], 2, "horiz");
 
@@ -246,22 +281,24 @@ describe("isBoxAttacked()", () => {
         board.receiveAttack([3, 8]);
         board.receiveAttack([3, 9]);
         board.receiveAttack([0, 0]);
-        board.receiveAttack([1, 0]);
     });
     
     test("Returns false when the box at the specified coords has NOT been attacked before", () => {
         expect(board.isBoxAttacked([5, 2])).toBe(false);
         expect(board.isBoxAttacked([5, 3])).toBe(false);
-        expect(board.isBoxAttacked([1, 2])).toBe(false);
-        expect(board.isBoxAttacked([0, 1])).toBe(false);
-        expect(board.isBoxAttacked([1, 1])).toBe(false);
         expect(board.isBoxAttacked([8, 6])).toBe(false);
+        expect(board.isBoxAttacked([0, 1])).toBe(false);
+        expect(board.isBoxAttacked([1, 0])).toBe(false);
+        expect(board.isBoxAttacked([1, 1])).toBe(false);
+        expect(board.isBoxAttacked([2, 0])).toBe(false);
+        expect(board.isBoxAttacked([2, 1])).toBe(false);
     });
 
     test("Returns true when the box has been already hit", () => {
         expect(board.isBoxAttacked([0, 0])).toBe(true);
-        expect(board.isBoxAttacked([1, 0])).toBe(true);
         expect(board.isBoxAttacked([3, 6])).toBe(true);
+        expect(board.isBoxAttacked([3, 7])).toBe(true);
+        expect(board.isBoxAttacked([3, 8])).toBe(true);
         expect(board.isBoxAttacked([3, 9])).toBe(true);
     });
 });
@@ -295,8 +332,8 @@ describe("randomize()", () => {
 
         for (const row of testBoard) {
             for (const box of row) {
-                if (typeof box === "object" && shipsFound.indexOf(box) === -1) {
-                    shipsFound.push(box);
+                if (typeof box === "object" && shipsFound.indexOf(box.ship) === -1) {
+                    shipsFound.push(box.ship);
                 }
             }
         }
