@@ -1,398 +1,413 @@
-import { gameController } from "./gameController.js";
-import { gameboard } from "./gameboard.js";
-import { HORIZONTAL, VERTICAL, isNumber } from "./utils.js";
+import { HORIZONTAL, VERTICAL, isNumber } from "../models/utils.js";
+import { gameController } from "../models/gameController.js";
 
-function placementScreen() {
-    const playerBoard = gameboard();
+function screenController() {
+    const game = gameController();
     const playerShips = [5, 4, 3, 3, 2];
-    let axis = HORIZONTAL;
+    const players = game.getPlayers();
     let placedShips = 0;
 
-    document.body.innerHTML = "";
-    render();
-
-    const placementBoard = document.getElementsByClassName("placement_board")[0];
-    const availableShips = document.getElementsByClassName("ships_available")[0];
-    const startGameBtn = document.getElementsByClassName("start-btn")[0];
-
-
-    function render() {
-        const placementSection = document.createElement("section");
-        const startGameSection = document.createElement("section");
-
-        const instructionsContainer = document.createElement("div");
-        const instructionsTitle = document.createElement("h2");
-
-        const boardContainer = document.createElement("div");
-
-        const shipsSection = document.createElement("div");
-        const shipsTitle = document.createElement("h2");
-        const shipsBtns = document.createElement("div");
-        const changeAxisBtn = document.createElement("button");
-        const randomizeBtn = document.createElement("button");
-        const availableShips = document.createElement("div");
-        const startGameBtn = document.createElement("button");
-
-        instructionsTitle.textContent = "Instructions";
-        shipsTitle.textContent = "Ships available";
-        changeAxisBtn.textContent = "Change Axis";
-        randomizeBtn.textContent = "Randomize";
-        startGameBtn.textContent = "START GAME";
-        changeAxisBtn.type = "button";
-        randomizeBtn.type = "button";
-        startGameBtn.type = "button";
-        startGameBtn.setAttribute("disabled", "");
-        instructionsContainer.insertAdjacentHTML(
-          "afterbegin",
-          `<p>
-                Suspendisse pharetra ipsum eu erat commodo, a faucibus elit volutpat. Nulla purus nibh, pretium et sapien quis, maximus
-                fermentum ipsum. Donec sagittis dui tellus, at rhoncus lectus viverra finibus. In viverra ante nec nisl congue, nec
-                tempus ex porta. Nam a diam sit amet turpis dignissim efficitur. Cras vitae pharetra ligula, ut faucibus nisl. Donec
-                pellentesque elit a varius convallis. Maecenas in pulvinar erat, in porta lacus. Quisque sit amet urna pharetra,
-                ullamcorper velit vitae, pretium mauris. Suspendisse mauris magna, auctor at ex at, pharetra rutrum nisl. Nam lobortis,
-                ligula in lacinia maximus, eros dui maximus ante, id pellentesque dolor tellus non lorem. Sed justo nisl, varius non
-                rhoncus in, commodo nec nibh. Quisque porttitor aliquet hendrerit. Praesent luctus purus eget auctor dignissim.
-            </p>
-            <p>
-                In hac habitasse platea dictumst. In luctus non enim sodales venenatis. Integer faucibus libero ac quam placerat
-                malesuada. Fusce gravida mauris id augue venenatis ullamcorper. Nam volutpat, ipsum vitae porttitor accumsan, magna
-                metus sodales mi, vitae fermentum magna velit sed odio. Nam viverra pulvinar nisi vel sodales. Vivamus in ullamcorper
-                risus. Nullam nec gravida felis. Suspendisse molestie sit amet libero ac pharetra. Fusce maximus nec ante at iaculis.
-                Etiam leo nisl, ullamcorper dignissim elit nec, varius egestas risus. Nullam vel consequat est, quis faucibus ipsum.
-                Proin auctor quam at molestie varius.
-            </p>`
-        );
-
-        document.body.classList.add("body-flex", "content-margin");
-        placementSection.classList.add("game_placement");
-        boardContainer.classList.add("placement_board", "board");
-        shipsSection.classList.add("placement_ships");
-        shipsBtns.classList.add("ships_actions");
-        availableShips.classList.add("ships_available");
-        changeAxisBtn.classList.add("primary-btn");
-        randomizeBtn.classList.add("secondary-btn");
-        startGameSection.classList.add("game_start");
-        startGameBtn.classList.add("primary-btn", "start-btn");
-
-        // Listeners
-        attachBoardListeners(boardContainer);
-        changeAxisBtn.addEventListener("click", changeShipsAxis);
-        randomizeBtn.addEventListener("click", randomizeShipsPositions);
-        startGameBtn.addEventListener("click", startGame);
-        for (const shipLen of playerShips) {
-            const ship = renderShip(shipLen);
-            availableShips.append(ship);
-        };
-
-        boardContainer.append(renderPlacementBoard());
-        instructionsContainer.prepend(instructionsTitle);
-        shipsBtns.append(changeAxisBtn, randomizeBtn);
-        shipsSection.append(shipsTitle, shipsBtns, availableShips);
-        placementSection.append(instructionsContainer, boardContainer, shipsSection);
-        startGameSection.append(startGameBtn);
-
-        document.body.prepend(placementSection, startGameSection);
-    }
-
-    function renderPlacementBoard() {
+    function createBoardUI(board, callback) {
         const fragment = document.createDocumentFragment();
-        const board = playerBoard.getBoard();
-        const shipsRendered = [];
-
         board.forEach((row, rowIndex) => {
             row.forEach((box, colIndex) => {
                 const div = document.createElement("div");
                 div.classList.add("board_box");
                 div.dataset.row = rowIndex;
                 div.dataset.col = colIndex;
-
-                if (typeof box === "object" && shipsRendered.indexOf(box) === -1) {
-                    shipsRendered.push(box);
-                    const ship = renderShip(box.length, box.axis);
-                    div.append(ship);
-
-                    placedShips++;
-                }
-
+        
+                callback(div, box, [rowIndex, colIndex]);
+        
                 fragment.append(div);
             });
         });
-        
+
         return fragment;
     }
 
-    function attachBoardListeners(board) {
-        board.addEventListener("dragover", e => {
-            e.preventDefault();
-        });
-        
-        board.addEventListener("dragenter", e => {
-            e.target.classList.add("selected");
-        });
-
-        board.addEventListener("dragleave", e => {
-            e.target.classList.remove("selected");
-        });
-
-        board.addEventListener("drop", e => {
-            e.preventDefault();
-
-            e.target.classList.remove("selected");
-            if (e.target === e.currentTarget) return;
-            
-            const sourceCoords = [
-                +e.dataTransfer.getData("sourceCoordY"),
-                +e.dataTransfer.getData("sourceCoordX")
-            ];
-            if (sourceCoords.every(coord => isNumber(coord))) playerBoard.removeShip(sourceCoords);
-            
-            const shipLen = +e.dataTransfer.getData("shipLen");
-            const shipAxis = e.dataTransfer.getData("shipAxis");
-            const offset = +e.dataTransfer.getData("offset");
-            const newCoords = [+e.target.dataset.row, +e.target.dataset.col];
-            (shipAxis === HORIZONTAL) ?
-                newCoords[1] -= offset :
-                newCoords[0] -= offset;
-            
-            const canBePlaced = playerBoard.placeShip(newCoords, shipLen, shipAxis);
-            if (canBePlaced) {
-                const newLocation = document.querySelector(`[data-row='${newCoords[0]}'][data-col='${newCoords[1]}']`);
-                const draggable = document.getElementsByClassName("dragging")[0];
-                newLocation.append(draggable);
-                
+    function createPlayerBoard(board, draggable = false) {
+        const shipsRendered = [];
+        return createBoardUI(board, ((container, box) => {
+            if (typeof box === "object" && shipsRendered.indexOf(box) === -1) {
+                const ship = renderShip(box.length, box.axis, draggable);
+                container.append(ship);
+                shipsRendered.push(box);
                 placedShips++;
-                checkIfGameCanStart();
-                return;
             }
+        }));
+    }
 
-            // If the ship can't be placed in the new location place it again where it was
-            playerBoard.placeShip(sourceCoords, shipLen, shipAxis);
-        });
-    } 
-
-    function renderShip(shipLen, axis = HORIZONTAL) {
+    function renderShip(shipLen, axis, draggable) {
         const ship = document.createElement("div");
-        ship.classList.add("ship", "draggable");
-        ship.draggable = "true";
-        ship.dataset.length = shipLen;
-
+        ship.classList.add("ship");
         if (axis === VERTICAL) ship.classList.add("vertical");
-        
-        let offset = 0;
+
         for (let i = 0; i < shipLen; i++) {
             const shipSection = document.createElement("div");
-            shipSection.dataset.offset = i;
-            shipSection.addEventListener("mousedown", e => {
-                const boxOffset = e.target.dataset.offset;
-                if (boxOffset) offset = boxOffset;
-            });
             ship.append(shipSection);
         }
+        
+        if (draggable === true) {
+            ship.classList.add("draggable");
+            ship.draggable = "true";
+            ship.dataset.length = shipLen;
 
-        ship.addEventListener("dragstart", e => {
-            ship.classList.add("dragging");
+            let offset = 0, index = 0;
+            for (const shipSection of ship.children) {
+                shipSection.dataset.offset = index;
+                shipSection.addEventListener("mousedown", e => {
+                    const boxOffset = e.target.dataset.offset;
+                    if (boxOffset) offset = boxOffset;
+                });
+                index++;
+            }
 
-            const box = e.target.parentNode;
-            e.dataTransfer.setData("sourceCoordY", box.dataset.row);
-            e.dataTransfer.setData("sourceCoordX", box.dataset.col);
-            e.dataTransfer.setData("shipLen", shipLen);
-            (e.currentTarget.classList.contains("vertical")) ?
-                e.dataTransfer.setData("shipAxis", VERTICAL) :
-                e.dataTransfer.setData("shipAxis", HORIZONTAL);
-            e.dataTransfer.setData("offset", offset);
-            e.dataTransfer.effectAllowed = "move";
-        });
+            ship.addEventListener("dragstart", e => {
+                ship.classList.add("dragging");
 
-        ship.addEventListener("dragend", () => {
-            ship.classList.remove("dragging");
-        });
+                const box = e.target.parentNode;
+                e.dataTransfer.setData("sourceCoordY", box.dataset.row);
+                e.dataTransfer.setData("sourceCoordX", box.dataset.col);
+                e.dataTransfer.setData("shipLen", shipLen);
+                (e.currentTarget.classList.contains("vertical")) ?
+                    e.dataTransfer.setData("shipAxis", VERTICAL) :
+                    e.dataTransfer.setData("shipAxis", HORIZONTAL);
+                e.dataTransfer.setData("offset", offset);
+                e.dataTransfer.effectAllowed = "move";
+            });
 
-        ship.addEventListener("dblclick", e => {
-            if (!e.currentTarget.closest(".board")) return;
+            ship.addEventListener("dragend", () => {
+                ship.classList.remove("dragging");
+            });
 
-            const parent = e.currentTarget.parentNode;
-            const coords = [+parent.dataset.row, +parent.dataset.col];
-            
-            const ship = playerBoard.getBoxAt(coords);
-            const shipLen = ship.length;
-            const currAxis = ship.axis;
-            const newAxis = (currAxis === HORIZONTAL) ? VERTICAL : HORIZONTAL;
+            ship.addEventListener("dblclick", e => {
+                if (!e.currentTarget.closest(".board")) return;
 
-            playerBoard.removeShip(coords);
+                const parent = e.currentTarget.parentNode;
+                const coords = [+parent.dataset.row, +parent.dataset.col];
+                
+                const ship = playerBoard.getBoxAt(coords);
+                const shipLen = ship.length;
+                const currAxis = ship.axis;
+                const newAxis = (currAxis === HORIZONTAL) ? VERTICAL : HORIZONTAL;
 
-            const canBePlaced = playerBoard.placeShip(coords, shipLen, newAxis);
-            (!canBePlaced) ?
-                playerBoard.placeShip(coords, shipLen, currAxis) :
-                e.currentTarget.classList.toggle("vertical");
-        });
+                playerBoard.removeShip(coords);
+
+                const canBePlaced = playerBoard.placeShip(coords, shipLen, newAxis);
+                (!canBePlaced) ?
+                    playerBoard.placeShip(coords, shipLen, currAxis) :
+                    e.currentTarget.classList.toggle("vertical");
+            });
+        }
 
         return ship;
     }
+        
+    function placementScreen() {
+        const playerBoard = players[0].gameboard;
+        let axis = HORIZONTAL;
 
-    function changeShipsAxis() {
-        const ships = availableShips.getElementsByClassName("ship");
+        render();
 
-        if (axis === HORIZONTAL) {
-            axis = VERTICAL;
-            availableShips.classList.add("vertical");
-            for (const ship of ships) {
-                ship.classList.add("vertical");
+        const placementBoard = document.getElementsByClassName("placement_board")[0];
+        const availableShips = document.getElementsByClassName("ships_available")[0];
+        const startGameBtn = document.getElementsByClassName("start-btn")[0];
+
+
+        function render() {
+            document.body.innerHTML = "";
+
+            const placementSection = document.createElement("section");
+            const startGameSection = document.createElement("section");
+
+            const instructionsContainer = document.createElement("div");
+            const instructionsTitle = document.createElement("h2");
+
+            const boardContainer = document.createElement("div");
+
+            const shipsSection = document.createElement("div");
+            const shipsTitle = document.createElement("h2");
+            const shipsBtns = document.createElement("div");
+            const changeAxisBtn = document.createElement("button");
+            const randomizeBtn = document.createElement("button");
+            const availableShips = document.createElement("div");
+            const startGameBtn = document.createElement("button");
+
+            instructionsTitle.textContent = "Instructions";
+            shipsTitle.textContent = "Ships available";
+            changeAxisBtn.textContent = "Change Axis";
+            randomizeBtn.textContent = "Randomize";
+            startGameBtn.textContent = "START GAME";
+            changeAxisBtn.type = "button";
+            randomizeBtn.type = "button";
+            startGameBtn.type = "button";
+            startGameBtn.setAttribute("disabled", "");
+            instructionsContainer.insertAdjacentHTML(
+            "afterbegin",
+            `<p>
+                    Suspendisse pharetra ipsum eu erat commodo, a faucibus elit volutpat. Nulla purus nibh, pretium et sapien quis, maximus
+                    fermentum ipsum. Donec sagittis dui tellus, at rhoncus lectus viverra finibus. In viverra ante nec nisl congue, nec
+                    tempus ex porta. Nam a diam sit amet turpis dignissim efficitur. Cras vitae pharetra ligula, ut faucibus nisl. Donec
+                    pellentesque elit a varius convallis. Maecenas in pulvinar erat, in porta lacus. Quisque sit amet urna pharetra,
+                    ullamcorper velit vitae, pretium mauris. Suspendisse mauris magna, auctor at ex at, pharetra rutrum nisl. Nam lobortis,
+                    ligula in lacinia maximus, eros dui maximus ante, id pellentesque dolor tellus non lorem. Sed justo nisl, varius non
+                    rhoncus in, commodo nec nibh. Quisque porttitor aliquet hendrerit. Praesent luctus purus eget auctor dignissim.
+                </p>
+                <p>
+                    In hac habitasse platea dictumst. In luctus non enim sodales venenatis. Integer faucibus libero ac quam placerat
+                    malesuada. Fusce gravida mauris id augue venenatis ullamcorper. Nam volutpat, ipsum vitae porttitor accumsan, magna
+                    metus sodales mi, vitae fermentum magna velit sed odio. Nam viverra pulvinar nisi vel sodales. Vivamus in ullamcorper
+                    risus. Nullam nec gravida felis. Suspendisse molestie sit amet libero ac pharetra. Fusce maximus nec ante at iaculis.
+                    Etiam leo nisl, ullamcorper dignissim elit nec, varius egestas risus. Nullam vel consequat est, quis faucibus ipsum.
+                    Proin auctor quam at molestie varius.
+                </p>`
+            );
+
+            document.body.classList.add("body-flex", "content-margin");
+            placementSection.classList.add("game_placement");
+            boardContainer.classList.add("placement_board", "board");
+            shipsSection.classList.add("placement_ships");
+            shipsBtns.classList.add("ships_actions");
+            availableShips.classList.add("ships_available");
+            changeAxisBtn.classList.add("primary-btn");
+            randomizeBtn.classList.add("secondary-btn");
+            startGameSection.classList.add("game_start");
+            startGameBtn.classList.add("primary-btn", "start-btn");
+
+            // Listeners
+            attachBoardListeners(boardContainer);
+            changeAxisBtn.addEventListener("click", changeShipsAxis);
+            randomizeBtn.addEventListener("click", randomizeShipsPositions);
+            startGameBtn.addEventListener("click", startGame);
+            for (const shipLen of playerShips) {
+                const ship = renderShip(shipLen, HORIZONTAL, true);
+                availableShips.append(ship);
+            };
+
+            boardContainer.append(createPlayerBoard(playerBoard.getBoard(), true));
+            instructionsContainer.prepend(instructionsTitle);
+            shipsBtns.append(changeAxisBtn, randomizeBtn);
+            shipsSection.append(shipsTitle, shipsBtns, availableShips);
+            placementSection.append(instructionsContainer, boardContainer, shipsSection);
+            startGameSection.append(startGameBtn);
+
+            document.body.prepend(placementSection, startGameSection);
+        }
+
+        function attachBoardListeners(board) {
+            board.addEventListener("dragover", e => {
+                e.preventDefault();
+            });
+            
+            board.addEventListener("dragenter", e => {
+                e.target.classList.add("selected");
+            });
+
+            board.addEventListener("dragleave", e => {
+                e.target.classList.remove("selected");
+            });
+
+            board.addEventListener("drop", e => {
+                e.preventDefault();
+
+                e.target.classList.remove("selected");
+                if (e.target === e.currentTarget) return;
+                
+                const sourceCoords = [
+                    +e.dataTransfer.getData("sourceCoordY"),
+                    +e.dataTransfer.getData("sourceCoordX")
+                ];
+                if (sourceCoords.every(coord => isNumber(coord))) playerBoard.removeShip(sourceCoords);
+                
+                const shipLen = +e.dataTransfer.getData("shipLen");
+                const shipAxis = e.dataTransfer.getData("shipAxis");
+                const offset = +e.dataTransfer.getData("offset");
+                const newCoords = [+e.target.dataset.row, +e.target.dataset.col];
+                (shipAxis === HORIZONTAL) ?
+                    newCoords[1] -= offset :
+                    newCoords[0] -= offset;
+                
+                const canBePlaced = playerBoard.placeShip(newCoords, shipLen, shipAxis);
+                if (canBePlaced) {
+                    const newLocation = document.querySelector(`[data-row='${newCoords[0]}'][data-col='${newCoords[1]}']`);
+                    const draggable = document.getElementsByClassName("dragging")[0];
+                    newLocation.append(draggable);
+                    
+                    placedShips++;
+                    checkIfGameCanStart();
+                    return;
+                }
+
+                // If the ship can't be placed in the new location place it again where it was
+                playerBoard.placeShip(sourceCoords, shipLen, shipAxis);
+            });
+        }
+
+        function changeShipsAxis() {
+            const ships = availableShips.getElementsByClassName("ship");
+
+            if (axis === HORIZONTAL) {
+                axis = VERTICAL;
+                availableShips.classList.add("vertical");
+                for (const ship of ships) {
+                    ship.classList.add("vertical");
+                }
+                
+                return;
             }
             
-            return;
+            axis = HORIZONTAL;
+            availableShips.classList.remove("vertical");
+            for (const ship of ships) {
+                ship.classList.remove("vertical");
+            }
+        }
+
+        function randomizeShipsPositions() {
+            placedShips = 0;
+            playerBoard.randomize(playerShips);
+            const newBoard = createPlayerBoard(playerBoard.getBoard(), true);
+            checkIfGameCanStart();
+
+            availableShips.innerHTML = "";
+            placementBoard.innerHTML = "";
+            placementBoard.append(newBoard);
+        }
+
+        function startGame() {
+            if (!checkIfGameCanStart()) return;
+
+            gameScreen();
+        }
+
+        function checkIfGameCanStart() {
+            if (placedShips === playerShips.length) {
+                startGameBtn.removeAttribute("disabled");
+                return true;
+            }
+        }
+    }
+
+    function gameScreen() {
+        const MARKER = "●";
+        const boards = [];
+        let isComputerTurn = false;
+        let playerTurn;
+
+        render();
+
+        const turn = document.getElementsByClassName("game_turn")[0];
+        const winModal = document.getElementsByClassName("game_win-modal")[0];
+        const winMessageModal = winModal.getElementsByClassName("win_msg")[0];
+        const winMessageTitle = winMessageModal.getElementsByClassName("win_msg-title")[0];
+
+
+        function render() {
+            document.body.innerHTML = "";
+            document.body.classList.add("body-flex");
+            document.body.insertAdjacentHTML("afterbegin", `
+                <section class="game content-margin">
+                    <div class="game_header">
+                        <h1>Battleship Game</h1>
+                    </div>
+                    <div class="game_turn"></div>
+                    <div class="game_boards"></div>
+                    <div class="game_win-modal">
+                        <div class="dark-overlay"></div>
+                        <div class="win_msg">
+                            <h2 class="win_msg-title"></h2>
+                            <p>Want to play again?</p>
+                            <button type="button" class="restart-btn">
+                                RESTART
+                            </button>
+                            
+                            <img class="win_msg-img"
+                                src="./images/deco-ship.png"
+                                alt="A warship in the sea">
+                        </div>
+                    </div>
+                </section>
+            `);
+
+            const gameBoardsSection = document.body.getElementsByClassName("game_boards")[0];
+            renderBoards(gameBoardsSection);
         }
         
-        axis = HORIZONTAL;
-        availableShips.classList.remove("vertical");
-        for (const ship of ships) {
-            ship.classList.remove("vertical");
+        function renderBoards(boardsSection) {
+            let boardIndex = 0;
+            for (const player of players) {
+                const board = player.gameboard.getBoard();
+                const boardUI = (boardIndex === 0) ?
+                    createPlayerBoard(board, false) :
+                    createEnemyBoard(board);
+                
+                const boardContainer = document.createElement("div");
+                boardContainer.classList.add("board");
+                boardContainer.append(boardUI);
+                boardsSection.append(boardContainer);
+
+                // Freeze the boards
+                boards.push(boardContainer);
+
+                boardIndex++;
+            }
         }
-    }
 
-    function randomizeShipsPositions() {
-        placedShips = 0;
-        playerBoard.randomize(playerShips);
-        const newBoard = renderPlacementBoard();
-        checkIfGameCanStart();
-
-        availableShips.innerHTML = "";
-        placementBoard.innerHTML = "";
-        placementBoard.append(newBoard);
-    }
-
-    function startGame(e) {
-        if (!checkIfGameCanStart()) return;
-        console.log(e);
-
-        domController();
-    }
-
-    function checkIfGameCanStart() {
-        if (placedShips === playerShips.length) {
-            startGameBtn.removeAttribute("disabled");
-            return true;
-        }
-    }
-}
-
-placementScreen();
-
-
-function domController() {
-    const MARKER = "●";
-    const game = gameController();
-    const players = game.getPlayers();
-    let isComputerTurn = false;
-
-
-    render();
-
-    // DOM cache
-    const gameboards = document.getElementsByClassName("game_boards")[0];
-    const turn = document.getElementsByClassName("game_turn")[0];
-    const winModal = document.getElementsByClassName("game_win-modal")[0];
-    const winMessageModal = winModal.getElementsByClassName("win_msg")[0];
-    const winMessageTitle = winMessageModal.getElementsByClassName("win_msg-title")[0];
-    const boards = [];
-
-    function render() {
-        document.body.innerHTML = "";
-        document.body.insertAdjacentHTML("afterbegin", `
-            <section class="game content-margin">
-                <div class="game_header">
-                    <h1>Battleship Game</h1>
-                </div>
-                <div class="game_turn"></div>
-                <div class="game_boards"></div>
-                <div class="game_win-modal">
-                    <div class="dark-overlay"></div>
-                    <div class="win_msg">
-                        <h2 class="win_msg-title"></h2>
-                        <p>Want to play again?</p>
-                        <button type="button" class="restart-btn">
-                            RESTART
-                        </button>
-                        
-                        <img class="win_msg-img" src="./images/deco-ship.png" alt="A warship in the sea">
-                    </div>
-                </div>
-            </section>
-        `);
-    };
-
-
-    const renderBoards = () => {
-        gameboards.innerHTML = "";
-
-        let index = 0;
-        for (const player of players) {
-            const board = player.gameboard.getBoard();
-            const boardUI = createBoardUI(board, index);
-            gameboards.append(boardUI);
-            boards.push(boardUI);
-            index++;
-        }
-    };
-    
-    const createBoardUI = (board, boardIndex) => {
-        const newBoard = document.createElement("section");
-        newBoard.classList.add("board");
-        if (boardIndex !== 0) newBoard.classList.add("enemy");
-
-        board.forEach((row, rowIndex) => {
-            row.forEach((col, colIndex) => {
-                const box = document.createElement("div");
-                box.textContent = col;
-
-                if (boardIndex !== 0) box.addEventListener("click", e => {
+        function createEnemyBoard(board) {
+            return createBoardUI(board, ((container, box, coords) => {
+                container.addEventListener("click", e => {
                     if (isComputerTurn) return;
-                    else if (players[boardIndex].gameboard.isBoxAvailable([rowIndex, colIndex]) === false) return;
-
                     isComputerTurn = true;
 
-                    const turn = game.playTurn([rowIndex, colIndex]);
+                    const turn = game.playTurn(coords);
+
+                    if (turn === null) return;
                     handleTurnResult(turn, e.currentTarget);
                     e.currentTarget.classList.add("not-available");
-
+                    
                     updateTurn();
                     computerTurn();
                 });
+            }));
+        }
+
+        const updateTurn = () => {
+            playerTurn = game.getCurrentPlayer();
+            turn.textContent = `${playerTurn.name}'s turn`;
+        };
+
+        const computerTurn = () => {
+            setTimeout(() => {
+                const turn = game.playComputerTurn();
+
+                const coords = players[1].getLastCoords;
+                const boxNumber = coords[0] * 10 + coords[1];
+                handleTurnResult(turn, boards[0].children[boxNumber]);
                 
-                newBoard.append(box);
-            });
-        });
+                updateTurn();
+                isComputerTurn = false;
+            }, 1500);
+        };
 
-        return newBoard;
-    };
+        const handleTurnResult = (turnResult, box) => {
+            box.textContent = MARKER;
 
-    const updateTurn = () => turn.textContent = `${game.getCurrentPlayer().name}'s turn`;
+            if (turnResult.shipHit) box.classList.add("hit");
+            if (turnResult.isGameWon) return showWinMessage();
+        };
 
-    const computerTurn = () => {
-        setTimeout(() => {
-            const turn = game.playComputerTurn();
+        const showWinMessage = () => {
+            winMessageTitle.textContent = `${playerTurn.name} CONQUERED!`;
+            winModal.classList.add("active");
+            winMessageModal.classList.add("active");
+        };
 
-            const coords = players[1].getLastCoords;
-            const boxNumber = coords[0] * 10 + coords[1];
-            handleTurnResult(turn, boards[0].children[boxNumber]);
-            
-            updateTurn();
-            isComputerTurn = false;
-        }, 1500);
-    };
+        updateTurn();
+    }
 
-    const handleTurnResult = (turnResult, box) => {
-        box.textContent = MARKER;
+    placementScreen();
+};
 
-        if (turnResult.shipHit) box.classList.add("hit");
-        if (turnResult.isGameWon) return showWinMessage();
-    };
-
-    const showWinMessage = () => {
-        winMessageTitle.textContent = `${game.getCurrentPlayer().name} CONQUERED!`;
-        winModal.classList.add("active");
-        winMessageModal.classList.add("active");
-    };
-
-    renderBoards();
-    updateTurn();
-}
+export {
+    screenController
+};
