@@ -1,0 +1,402 @@
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+::selection {
+  background-color: hsla(209, 75%, 37%, 0.685);
+  color: white;
+}
+
+:root {
+  --accent: hsl(216, 100%, 50%);
+  --darkBlue: hsl(210, 55%, 4%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+html {
+  height: 100%;
+  font-size: 10px;
+}
+
+body {
+  min-height: 100%;
+  background-color: rgb(3, 21, 49);
+  background-color: hsl(212, 76%, 9%);
+  font-family: Heebo, sans-serif;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: white;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+h1, h2 {
+  line-height: 1;
+}
+
+h1 {
+  color: white;
+  font-size: 5rem;
+  font-weight: 800;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+p + p {
+  margin-top: 15px;
+}
+
+
+
+
+/* ----- Placement screen ----- */
+.game_placement {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: auto;
+  gap: 75px;
+}
+
+.game_start {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Board section */
+.placement_board {
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+}
+
+/* Ships section */
+.placement_ships > * {
+  margin-bottom: 20px;
+}
+
+.ships_actions {
+  display: flex;
+  gap: 20px;
+}
+
+.ships_actions > button {
+  flex-grow: 1;
+}
+
+.ships_available {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ships_available.vertical {
+  flex-direction: row;
+}
+
+/* Ships */
+.ship {
+  display: grid;
+  grid-auto-flow: column;
+  outline: 2px solid hsl(186, 100%, 50%);
+  position: relative;
+  z-index: 2;
+}
+
+.ship-placed {
+  width: 48px;
+  height: 48px;
+}
+
+.ship.vertical {
+  /* flex-direction: column; */
+  grid-auto-flow: row;
+}
+
+.ship > div {
+  width: 48px;
+  height: 48px;
+  background-color: hsl(208.3, 59.2%, 52.9%);
+}
+
+/* Dragging classes */
+.draggable {
+  cursor: move;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.board_box > .draggable.dragging {
+  visibility: hidden;
+  opacity: 0;
+  z-index: 0;
+  transition: 0.02s;
+}
+
+.board_box.selected {
+  background-color: hsl(189, 100%, 50%);
+}
+
+
+
+
+/* ----- Game screen ----- */
+.game {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.game_header {
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+.game_turn {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.game_boards {
+  display: grid;
+  gap: 130px;
+  justify-content: space-between;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  margin-top: 50px;
+}
+
+
+
+
+/* ----- Board ----- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  border: 2px solid hsl(200, 96%, 40%);
+  aspect-ratio: 1 / 1;
+  flex-grow: 1;
+  counter-reset: numberCoords letterCoords;
+}
+
+.board_box {
+  width: 48px;
+  height: 48px;
+}
+
+.board.enemy {
+  background-color: hsl(0, 88%, 10%);
+  border: 2px solid hsl(0, 96%, 40%);
+}
+
+.board.enemy > div {
+  border: 1px solid rgba(71, 11, 11, 0.85);
+  cursor: pointer;
+}
+
+.board > div {
+  border: 1px solid hsl(216.3, 72.9%, 18%);
+  position: relative;
+  display: grid;
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  transition: 0.25s background-color, 0.25s border ease;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
+.board > div::before,
+.board > div::after {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  color: white;
+}
+
+.board > div:nth-last-of-type(10n)::after {
+  content: counter(numberCoords);
+  top: 0%;
+  transform: translateX(-100%);
+  counter-increment: numberCoords;
+}
+
+.board > div:nth-child(-n+10)::before {
+  content: counter(letterCoords, upper-alpha);
+  transform: translateY(-100%);
+  counter-increment: letterCoords;
+}
+
+.board.enemy > .hit:hover,
+.board.enemy > .not-available:hover {
+  background-color: rgba(128, 62, 62, 0.54);
+  border: 1px solid hsl(0, 62%, 75%);
+}
+
+.board.enemy > div:hover {
+  background-color: hsla(211, 52%, 33.5%, 0.54);
+  border: 1px solid hsl(200, 93%, 48%);
+}
+
+.hit {
+  color: red;
+}
+
+
+
+
+/* ----- Win modal ----- */
+.game_win-modal {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.game_win-modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.win_msg {
+  position: absolute;
+  top: calc(50% - 30px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 575px;
+  padding: 80px 80px 100px;
+  text-align: center;
+  border-bottom: 15px solid var(--accent);
+  border-radius: 10px;
+  background-color: var(--darkBlue);
+  box-shadow: 0px 8px 6.6px rgba(0, 0, 0, 0.041), 0px 23.7px 24.9px rgba(0, 0, 0, 0.055), 0px 52.9px 61.9px rgba(0, 0, 0, 0.062), 0px 107.1px 91.1px rgba(0, 0, 0, 0.067), 0px 181px 105px rgba(0, 0, 0, 0.07);
+  transition: top 0.4s, opacity 0.4s ease;
+  opacity: 0;
+}
+
+.win_msg.active {
+  top: 50%;
+  opacity: 1;
+}
+
+.win_msg-title {
+  font-size: 5.6rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.win_msg > p {
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.win_msg-img {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  max-width: 500px;
+  transform: translateX(-40%) translateY(30%);
+  pointer-events: none;
+}
+
+
+
+
+/* ----- Buttons ----- */
+button {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s all ease;
+}
+
+.restart-btn {
+  padding: 15px 30px;
+  font-size: 2.4rem;
+  font-weight: 800;
+  border-radius: 2px;
+  color: var(--darkBlue);
+  background-color: var(--accent);
+}
+
+.primary-btn {
+  background-color: var(--accent);
+  color: white;
+  padding: 15px 30px;
+  font-weight: 800;
+  border-radius: 2px;
+}
+
+.secondary-btn {
+  background-color: transparent;
+  color: var(--accent);
+  padding: 15px 30px;
+  font-weight: 800;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+}
+
+.start-btn {
+  padding: 20px 40px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: auto;
+}
+
+
+
+
+/* ----- Utilities ----- */
+.body-flex {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-margin {
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1400px;
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+.dark-overlay {
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(5, 21, 43, 0.7);
+}
