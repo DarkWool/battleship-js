@@ -1,14 +1,13 @@
 import { gameboard } from "../gameboard.js";
 
-let board = gameboard();
-let testBoard = board.getBoard();
-
+let board, testBoard;
+function newBoard() {
+    board = gameboard();
+    testBoard = board.getBoard();
+}
+newBoard();
 
 describe("getBoard()", () => {
-    beforeEach(() => {
-        testBoard = board.getBoard();
-    });
-
     test("Should return an array", () => {
         expect(testBoard).toBeInstanceOf(Array);
     });
@@ -29,10 +28,7 @@ describe("getBoard()", () => {
 });
 
 describe("placeShip()", () => {
-    beforeEach(() => {
-        board = gameboard();
-        testBoard = board.getBoard();
-    });
+    beforeEach(() => newBoard());
 
     test("Places a ship on the board horizontally", () => {
         expect(board.placeShip([2, 3], 5, "horiz")).toBe(true);
@@ -66,40 +62,50 @@ describe("placeShip()", () => {
 
 describe("canShipBePlaced()", () => {
     test("Returns false when ship's length is less than or equal to zero", () => {
-        expect(board.canShipBePlaced([0, 0], 0, true)).toBe(false);
-        expect(board.canShipBePlaced([4, 7], -5, true)).toBe(false);
-        expect(board.canShipBePlaced([9, 9], -2, false)).toBe(false);
+        expect(board.canShipBePlaced([0, 0], 0, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([4, 7], -5, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([9, 9], -2, "vert")).toBe(false);
     });
 
     test("Returns false when axis are horizontal and the X coord plus ship's length is greater than the board length", () => {
-        expect(board.canShipBePlaced([5, 8], 5, true)).toBe(false);
-        expect(board.canShipBePlaced([9, 7], 4, true)).toBe(false);
-        expect(board.canShipBePlaced([3, 6], 5, true)).toBe(false);
-        expect(board.canShipBePlaced([8, 9], 2, true)).toBe(false);
+        expect(board.canShipBePlaced([5, 8], 5, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([9, 7], 4, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([3, 6], 5, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([8, 9], 2, "horiz")).toBe(false);
     });
 
     test("Returns false when axis are vertical and the Y coord plus ship's length is greater than the board length", () => {
-        expect(board.canShipBePlaced([9, 7], 3, false)).toBe(false);
-        expect(board.canShipBePlaced([6, 3], 5, false)).toBe(false);
-        expect(board.canShipBePlaced([7, 9], 4, false)).toBe(false);
-        expect(board.canShipBePlaced([8, 5], 3, false)).toBe(false);
-        expect(board.canShipBePlaced([9, 1], 2, false)).toBe(false);
+        expect(board.canShipBePlaced([9, 7], 3, "vert")).toBe(false);
+        expect(board.canShipBePlaced([6, 3], 5, "vert")).toBe(false);
+        expect(board.canShipBePlaced([7, 9], 4, "vert")).toBe(false);
+        expect(board.canShipBePlaced([8, 5], 3, "vert")).toBe(false);
+        expect(board.canShipBePlaced([9, 1], 2, "vert")).toBe(false);
+    });
+
+    test("Returns false when coords are not numbers", () => {
+        expect(board.canShipBePlaced([0, "x"], 3, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([4, "asd"], 5, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([false, true], 2, "vert")).toBe(false);
+        expect(board.canShipBePlaced([NaN, false], 2, "vert")).toBe(false);
+        expect(board.canShipBePlaced([NaN, 5], 2, "vert")).toBe(false);
+        expect(board.canShipBePlaced([NaN, NaN], 2, "vert")).toBe(false);
+        expect(board.canShipBePlaced([{3:1}, 8], 2, "vert")).toBe(false);
     });
 
     test("Returns false if one of the coords is less than zero", () => {
-        expect(board.canShipBePlaced([-2, 7], 3, false)).toBe(false);
-        expect(board.canShipBePlaced([6, -3], 5, false)).toBe(false);
-        expect(board.canShipBePlaced([-7, 9], 4, true)).toBe(false);
-        expect(board.canShipBePlaced([-8, -5], 3, true)).toBe(false);
-        expect(board.canShipBePlaced([-9, 1], 2, false)).toBe(false);
+        expect(board.canShipBePlaced([-2, 7], 3, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([6, -3], 5, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([-7, 9], 4, "vert")).toBe(false);
+        expect(board.canShipBePlaced([-8, -5], 3, "vert")).toBe(false);
+        expect(board.canShipBePlaced([-9, 1], 2, "horiz")).toBe(false);
     });
 
     test("Returns false if one of the coords is greater than the board length", () => {
-        expect(board.canShipBePlaced([9, 10], 3, false)).toBe(false);
-        expect(board.canShipBePlaced([5, 15], 5, false)).toBe(false);
-        expect(board.canShipBePlaced([11, 0], 4, true)).toBe(false);
-        expect(board.canShipBePlaced([7, 19], 3, true)).toBe(false);
-        expect(board.canShipBePlaced([10, 9], 2, true)).toBe(false);
+        expect(board.canShipBePlaced([9, 10], 3, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([5, 15], 5, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([11, 0], 4, "vert")).toBe(false);
+        expect(board.canShipBePlaced([7, 19], 3, "vert")).toBe(false);
+        expect(board.canShipBePlaced([10, 9], 2, "vert")).toBe(false);
     });
 
     test("Returns false when a ship is already placed at the given coords", () => {
@@ -107,38 +113,37 @@ describe("canShipBePlaced()", () => {
         board.placeShip([0, 8], 2, "vert");
         board.placeShip([5, 6], 4, "horiz");
 
-        expect(board.canShipBePlaced([2, 2], 3, true)).toEqual(false);
-        expect(board.canShipBePlaced([2, 3], 3, true)).toEqual(false);
-        expect(board.canShipBePlaced([2, 4], 2, true)).toEqual(false);
-        expect(board.canShipBePlaced([2, 5], 2, true)).toEqual(false);
-        expect(board.canShipBePlaced([2, 6], 2, true)).toEqual(false);
-        expect(board.canShipBePlaced([0, 8], 2, false)).toEqual(false);
-        expect(board.canShipBePlaced([1, 8], 2, false)).toEqual(false);
-        expect(board.canShipBePlaced([5, 6], 2, true)).toEqual(false);
-        expect(board.canShipBePlaced([5, 7], 2, true)).toEqual(false);
-        expect(board.canShipBePlaced([5, 8], 2, true)).toEqual(false);
-        expect(board.canShipBePlaced([5, 9], 2, true)).toEqual(false);
+        expect(board.canShipBePlaced([2, 2], 3, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([2, 3], 3, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([2, 4], 2, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([2, 5], 2, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([2, 6], 2, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([0, 8], 2, "horiz")).toEqual(false);
+        expect(board.canShipBePlaced([1, 8], 2, "horiz")).toEqual(false);
+        expect(board.canShipBePlaced([5, 6], 2, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([5, 7], 2, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([5, 8], 2, "vert")).toEqual(false);
+        expect(board.canShipBePlaced([5, 9], 2, "vert")).toEqual(false);
     });
 
     test("You can't place a new ship around another one, a space of 1 box is required between them", () => {
-        expect(board.canShipBePlaced([1, 2], 1, true)).toBe(false);
-        expect(board.canShipBePlaced([2, 2], 1, true)).toBe(false);
-        expect(board.canShipBePlaced([2, 8], 1, true)).toBe(false);
-        expect(board.canShipBePlaced([3, 5], 3, true)).toBe(false);
+        expect(board.canShipBePlaced([1, 2], 1, "vert")).toBe(false);
+        expect(board.canShipBePlaced([2, 2], 1, "vert")).toBe(false);
+        expect(board.canShipBePlaced([2, 8], 1, "vert")).toBe(false);
+        expect(board.canShipBePlaced([3, 5], 3, "vert")).toBe(false);
 
-        expect(board.canShipBePlaced([0, 7], 1, true)).toBe(false); 
-        expect(board.canShipBePlaced([0, 8], 1, true)).toBe(false);
-        expect(board.canShipBePlaced([0, 9], 1, true)).toBe(false);
-        expect(board.canShipBePlaced([1, 7], 1, false)).toBe(false);
-        expect(board.canShipBePlaced([1, 8], 1, true)).toBe(false);
-        expect(board.canShipBePlaced([1, 9], 1, false)).toBe(false);
+        expect(board.canShipBePlaced([0, 7], 1, "vert")).toBe(false); 
+        expect(board.canShipBePlaced([0, 8], 1, "vert")).toBe(false);
+        expect(board.canShipBePlaced([0, 9], 1, "vert")).toBe(false);
+        expect(board.canShipBePlaced([1, 7], 1, "horiz")).toBe(false);
+        expect(board.canShipBePlaced([1, 8], 1, "vert")).toBe(false);
+        expect(board.canShipBePlaced([1, 9], 1, "horiz")).toBe(false);
     });
 });
 
 describe("receiveAttack()", () => {
     beforeAll(() => {
-        board = gameboard();
-        testBoard = board.getBoard();
+        newBoard();
         board.placeShip([3, 6], 4, "horiz");
         board.placeShip([0, 0], 2, "vert");
     });
@@ -221,10 +226,7 @@ describe("receiveAttack()", () => {
 });
 
 describe("getBoxAt()", () => {
-    beforeEach(() => {
-        board = gameboard();
-        testBoard = board.getBoard();
-    });
+    beforeAll(() => newBoard());
 
     test("Returns the value of the box at the input coords", () => {
         board.placeShip([4, 4], 2, "horiz");
@@ -240,8 +242,7 @@ describe("getBoxAt()", () => {
 
 describe("removeShip()", () => {
     beforeAll(() => {
-        board = gameboard();
-        testBoard = board.getBoard();
+        newBoard();
         board.placeShip([0, 0], 5, "vert");
         board.placeShip([2, 6], 2, "vert");
         board.placeShip([7, 3], 5, "horiz");
@@ -267,12 +268,20 @@ describe("removeShip()", () => {
         expect(testBoard[7][6]).toBe("");
         expect(testBoard[7][7]).toBe("");
     });
+
+    test("Returns null with non-valid coords", () => {
+        expect(board.removeShip([null, 4])).toBeNull();
+        expect(board.removeShip([3, ""])).toBeNull();
+        expect(board.removeShip([7, undefined])).toBeNull();
+        expect(board.removeShip([7, 10])).toBeNull();
+        expect(board.removeShip([-1, 8])).toBeNull();
+        expect(board.removeShip([5, {6: 8}])).toBeNull();
+    });
 });
 
 describe("isBoxAttacked()", () => {
     beforeAll(() => {
-        board = gameboard();
-        testBoard = board.getBoard();
+        newBoard();
         board.placeShip([3, 6], 4, "horiz");
         board.placeShip([0, 0], 2, "vert");
 
@@ -304,10 +313,7 @@ describe("isBoxAttacked()", () => {
 });
 
 describe("randomize()", () => {
-    beforeAll(() => {
-        board = gameboard();
-        testBoard = board.getBoard();
-    });
+    beforeAll(() => newBoard());
 
     test("Places a new ship on the board for every element in the array", () => {
         const shipsToPlace = [5, 4, 3, 3, 2];
@@ -351,7 +357,7 @@ describe("randomize()", () => {
 
 describe("areAllShipsSunk()", () => {
     beforeAll(() => {
-        board = gameboard();
+        newBoard();
         board.placeShip([0, 0], 2, "horiz");
     });
     
