@@ -1,4 +1,5 @@
 import { player } from "./player.js";
+import { getRandomCoords } from "./utils.js";
 
 function computerPlayer(name = "PC") {
     let lastCoords;
@@ -11,12 +12,6 @@ function computerPlayer(name = "PC") {
 
         lastCoords = coords;
         return enemyBoard.receiveAttack(coords);
-    };
-
-    const getRandomCoords = (max) => {
-        const coordY = Math.floor(Math.random() * (max - 0 + 1)) + 0;
-        const coordX = Math.floor(Math.random() * (max - 0 + 1)) + 0;
-        return [coordY, coordX];
     };
 
     // Inherit from player

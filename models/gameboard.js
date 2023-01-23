@@ -1,4 +1,4 @@
-import { HORIZONTAL } from "./utils.js";
+import { HORIZONTAL, getRandomCoords } from "./utils.js";
 import { ship } from "./ship.js";
 
 
@@ -139,13 +139,12 @@ function gameboard() {
 
         const boardLen = board.length;
         ships.forEach(shipLen => {
-            let coordX, coordY, axis;
+            let coords, axis;
 
             do {
-                coordY = Math.floor(Math.random() * (boardLen + 1));
-                coordX = Math.floor(Math.random() * (boardLen + 1));
+                coords = getRandomCoords(boardLen);
                 axis = (Math.random() > 0.5) ? "horiz" : "vert";
-            } while (placeShip([coordY, coordX], shipLen, axis) === false);
+            } while (placeShip(coords, shipLen, axis) === false);
         });
     }
 
