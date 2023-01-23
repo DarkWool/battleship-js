@@ -1,11 +1,10 @@
 import { player } from "./player.js";
 import { computerPlayer } from "./computerPlayer.js";
-import { gameboard } from "./gameboard.js";
 import { HORIZONTAL } from "./utils.js";
 
 function gameController() {
-    const playerA = player("Wool", gameboard());
-    const playerB = computerPlayer("PC", gameboard());
+    const playerA = player("Wool");
+    const playerB = computerPlayer("PC");
     const players = [playerA, playerB];
     
     let playerTurn = playerA;

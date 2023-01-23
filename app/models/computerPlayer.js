@@ -1,6 +1,6 @@
 import { player } from "./player.js";
 
-function computerPlayer(name = "PC", gameboard) {
+function computerPlayer(name = "PC") {
     let lastCoords;
     
     const attack = (enemyBoard) => {
@@ -20,7 +20,7 @@ function computerPlayer(name = "PC", gameboard) {
     };
 
     // Inherit from player
-    const newPlayer = player(name, gameboard);
+    const newPlayer = player(name);
     return {
         ...newPlayer,
         attack,
