@@ -2,7 +2,7 @@ import { computerPlayer } from "../computerPlayer.js";
 import { gameboard } from "../gameboard.js";
 
 const enemyGameboard = gameboard();
-const player = computerPlayer("PC", gameboard());
+const player = computerPlayer();
 
 describe("computerPlayer inherits properties from 'player'", () => {
     test("Should have a 'name' property", () => {
