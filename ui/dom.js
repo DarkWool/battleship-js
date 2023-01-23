@@ -5,6 +5,7 @@ function screenController() {
     const game = gameController();
     const playerShips = [5, 4, 3, 3, 2];
     const players = game.getPlayers();
+    const playerBoard = players[0].board;
     let placedShips = 0;
 
     function createBoardUI(board, callback) {
@@ -87,9 +88,9 @@ function screenController() {
                 const parent = e.currentTarget.parentNode;
                 const coords = [+parent.dataset.row, +parent.dataset.col];
                 
-                const ship = playerBoard.getBoxAt(coords);
-                const shipLen = ship.length;
-                const currAxis = ship.axis;
+                const box = playerBoard.getBoxAt(coords);
+                const shipLen = box.ship.length;
+                const currAxis = box.ship.axis;
                 const newAxis = (currAxis === HORIZONTAL) ? VERTICAL : HORIZONTAL;
 
                 playerBoard.removeShip(coords);
@@ -105,7 +106,6 @@ function screenController() {
     }
         
     function placementScreen() {
-        const playerBoard = players[0].board;
         let axis = HORIZONTAL;
 
         render();
@@ -282,7 +282,7 @@ function screenController() {
         }
 
         function checkIfGameCanStart() {
-            if (placedShips === playerShips.length) {
+            if (placedShips >= playerShips.length) {
                 startGameBtn.removeAttribute("disabled");
                 return true;
             }
