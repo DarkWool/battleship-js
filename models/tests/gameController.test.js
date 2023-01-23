@@ -8,8 +8,8 @@ describe("getPlayers()", () => {
         expect(players).toBeInstanceOf(Array);
         expect(players[0]).toHaveProperty("name");
         expect(players[1]).toHaveProperty("name");
-        expect(players[0]).toHaveProperty("gameboard");
-        expect(players[1]).toHaveProperty("gameboard");
+        expect(players[0]).toHaveProperty("board");
+        expect(players[1]).toHaveProperty("board");
         expect(players[0]).toHaveProperty("attack");
         expect(players[1]).toHaveProperty("attack");
     });
@@ -23,7 +23,7 @@ describe("getCurrentPlayer()", () => {
     test("Should return the current player", () => {
         const currPlayer = game.getCurrentPlayer();
         expect(currPlayer).toHaveProperty("name");
-        expect(currPlayer).toHaveProperty("gameboard");
+        expect(currPlayer).toHaveProperty("board");
         expect(currPlayer).toHaveProperty("attack");
     });
 });

@@ -105,7 +105,7 @@ function screenController() {
     }
         
     function placementScreen() {
-        const playerBoard = players[0].gameboard;
+        const playerBoard = players[0].board;
         let axis = HORIZONTAL;
 
         render();
@@ -337,7 +337,7 @@ function screenController() {
         function renderBoards(boardsSection) {
             let boardIndex = 0;
             for (const player of players) {
-                const board = player.gameboard.getBoard();
+                const board = player.board.getBoard();
                 const boardUI = (boardIndex === 0) ?
                     createPlayerBoard(board, false) :
                     createEnemyBoard(board);

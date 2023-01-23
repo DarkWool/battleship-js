@@ -23,23 +23,23 @@ describe("Name prop", () => {
     });
 });
 
-describe("Gameboard prop", () => {
-    test("Should have a 'gameboard' property", () => {
-        expect(playerA).toHaveProperty("gameboard");
-        expect(playerB).toHaveProperty("gameboard");
+describe("Board prop", () => {
+    test("Should have a 'board' property", () => {
+        expect(playerA).toHaveProperty("board");
+        expect(playerB).toHaveProperty("board");
     });
 });
 
 describe("attack()", () => {
     test("It shouldn't shoot to the same coords twice", () => {
-        playerA.attack(playerB.gameboard, [2, 5]);
-        playerA.attack(playerB.gameboard, [0, 8]);
-        playerA.attack(playerB.gameboard, [9, 9]);
+        playerA.attack(playerB.board, [2, 5]);
+        playerA.attack(playerB.board, [0, 8]);
+        playerA.attack(playerB.board, [9, 9]);
         
-        const receiveAttack = jest.spyOn(playerB.gameboard, "receiveAttack");
-        playerA.attack(playerB.gameboard, [2, 5]);
-        playerA.attack(playerB.gameboard, [0, 8]);
-        playerA.attack(playerB.gameboard, [9, 9]);
+        const receiveAttack = jest.spyOn(playerB.board, "receiveAttack");
+        playerA.attack(playerB.board, [2, 5]);
+        playerA.attack(playerB.board, [0, 8]);
+        playerA.attack(playerB.board, [9, 9]);
 
         expect(receiveAttack).not.toHaveBeenCalled();
     });

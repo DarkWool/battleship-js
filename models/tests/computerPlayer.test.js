@@ -9,8 +9,8 @@ describe("computerPlayer inherits properties from 'player'", () => {
         expect(player).toHaveProperty("name");
     });
     
-    test("Should have a 'gameboard' property", () => {
-        expect(player).toHaveProperty("gameboard");
+    test("Should have a 'board' property", () => {
+        expect(player).toHaveProperty("board");
     });
 });
 
