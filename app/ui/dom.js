@@ -182,7 +182,7 @@ function screenController() {
 
             mainContainer.classList.add("margin-auto-y");
             document.body.classList.add("body-flex", "content-margin");
-            placementSection.classList.add("game_placement");
+            placementSection.classList.add("game_placement", "fadeInDown", "animated");
             battleshipLogo.classList.add("instructions_logo");
             boardContainer.classList.add("placement_board", "board");
             shipsSection.classList.add("placement_ships");
@@ -191,7 +191,7 @@ function screenController() {
             changeAxisBtn.classList.add("btn-primary");
             randomizeBtn.classList.add("btn-secondary-dark");
             startGameSection.classList.add("placement_start");
-            startGameBtn.classList.add("btn-primary", "btn-start");
+            startGameBtn.classList.add("btn-primary", "btn-start", "jackInTheBox", "animated");
 
             // Listeners
             attachBoardListeners(boardContainer);
@@ -301,6 +301,7 @@ function screenController() {
         function checkIfGameCanStart() {
             if (playerBoard.getPlacedShipsCount() === playerShips.length) {
                 startGameBtn.removeAttribute("disabled");
+                startGameBtn.classList.add("flash");
                 return true;
             }
         }
@@ -333,7 +334,7 @@ function screenController() {
 
             gameSection.innerHTML += `
                 <div class="game_status">
-                    <span class="accent-color">STATUS:</span>
+                    <span class="accent-color flash">STATUS:</span>
                     <p id="turnStatus"></p>
                 </div>
                 <div class="game_boards"></div>
@@ -370,7 +371,13 @@ function screenController() {
                 
                 const boardContainer = document.createElement("div");
                 boardContainer.classList.add("board");
-                if (boardIndex !== 0) boardContainer.classList.add("enemy");
+                if (boardIndex !== 0) {
+                    boardContainer.classList.add("enemy");
+                    boardContainer.classList.add("zoomIn", "animated-fast");
+                } else {
+                    boardContainer.classList.add("zoomIn", "animated-fast");
+                }
+
                 boardContainer.append(boardUI);
                 boardsSection.append(boardContainer);
 
