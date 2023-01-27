@@ -66,6 +66,7 @@ function screenController() {
             }
 
             ship.addEventListener("dragstart", e => {
+                e.currentTarget.classList.remove("shake", "animated-fast", "invalid-move");
                 ship.classList.add("dragging");
 
                 const box = e.target.parentNode;
@@ -97,9 +98,17 @@ function screenController() {
                 playerBoard.removeShip(coords);
 
                 const canBePlaced = playerBoard.placeShip(coords, shipLen, newAxis);
-                (!canBePlaced) ?
-                    playerBoard.placeShip(coords, shipLen, currAxis) :
+                if (canBePlaced) {
                     e.currentTarget.classList.toggle("vertical");
+                } else {
+                    e.currentTarget.classList.add("shake", "animated-fast", "invalid-move");
+                    playerBoard.placeShip(coords, shipLen, currAxis);
+
+                    const currTarget = e.currentTarget;
+                    setTimeout(() => {
+                        currTarget.classList.remove("shake", "animated-fast", "invalid-move");
+                    }, 500);
+                }
             });
         }
 
