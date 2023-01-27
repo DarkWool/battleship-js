@@ -90,6 +90,8 @@ function gameboard() {
             board[coordY][coordX] = HIT_MARK;
 
             if (ship.isSunk()) {
+                result.beginningCoords = box.beginningCoords;
+                result.ship = box.ship;
                 result.adjacentCoords =
                     getAndAttackAdjacentBoxes(box.beginningCoords, ship.length, ship.axis);
             }

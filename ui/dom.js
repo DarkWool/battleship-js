@@ -438,15 +438,28 @@ function screenController() {
             if (turnResult.shipHit) {
                 markerBox.textContent = HIT_MARKER;
                 box.classList.add("hit");
-                if (turnResult.adjacentCoords) {
-                    turnResult.adjacentCoords.forEach(coords => {
-                        const box = board.querySelector(`[data-row="${coords[0]}"][data-col="${coords[1]}"]`);
-                        box.textContent = MARKER;
-                        box.classList.add("not-available");
-                    });
-                }
             }
             else markerBox.textContent = MARKER;
+            
+            if (turnResult.adjacentCoords) {
+                turnResult.adjacentCoords.forEach(coords => {
+                    const box = board.querySelector(`[data-row="${coords[0]}"][data-col="${coords[1]}"]`);
+                    box.textContent = MARKER;
+                    box.classList.add("not-available");
+                });
+
+                const shipBox = board.querySelector(
+                    `[data-row="${turnResult.beginningCoords[0]}"][data-col="${turnResult.beginningCoords[1]}"]`
+                );
+                const ship = shipBox.getElementsByClassName("ship")[0];
+                if (ship == null) {
+                    let shipUI = renderShip(turnResult.ship.length, turnResult.ship.axis, false);
+                    shipUI.classList.add("sunk");
+                    shipBox.append(shipUI);
+                    return;
+                }
+                ship.classList.add("sunk");
+            }
         };
 
         const showWinMessage = () => {

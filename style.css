@@ -351,6 +351,11 @@ button:disabled {
   height: 48px;
 }
 
+.ship.sunk {
+  outline-color: var(--secondaryAccent);
+  background: none;
+}
+
 .ship.vertical {
   grid-auto-flow: row;
 }
