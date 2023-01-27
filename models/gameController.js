@@ -24,15 +24,15 @@ function gameController() {
     const playTurn = (coords) => {
         const currPlayer = getCurrentPlayer();
         const enemy = players.find(player => player.name !== currPlayer.name);
-        const shipHit = currPlayer.attack(enemy.board, coords);
-        if (shipHit == null) return;
+        const attack = currPlayer.attack(enemy.board, coords);
+        if (attack == null) return;
         
         // Before changing turn check if the curr player has won
         const isGameWon = checkWin(enemy.board);
-        if (!isGameWon) switchTurn();
+        if (!isGameWon && attack.shipHit === false) switchTurn();
 
         return {
-            ...shipHit,
+            ...attack,
             isGameWon,
         };
     };
@@ -40,14 +40,14 @@ function gameController() {
     const playComputerTurn = () => {
         const currPlayer = getCurrentPlayer();
         const enemy = players.find(player => player.name !== currPlayer.name);
-        const shipHit = playerB.attack(playerA.board);
-        if (shipHit == null) return;
+        const attack = playerB.attack(playerA.board);
+        if (attack == null) return;
 
         const isGameWon = checkWin(enemy.board);
-        if (!isGameWon) switchTurn();
+        if (!isGameWon && attack.shipHit === false) switchTurn();
 
         return {
-            ...shipHit,
+            ...attack,
             isGameWon,
         };
     };
