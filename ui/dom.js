@@ -6,7 +6,6 @@ function screenController() {
     const playerShips = [5, 4, 3, 3, 2];
     const players = game.getPlayers();
     const playerBoard = players[0].board;
-    let placedShips = 0;
 
     function createBoardUI(board, callback) {
         const fragment = document.createDocumentFragment();
@@ -34,7 +33,6 @@ function screenController() {
                 const shipUI = renderShip(ship.length, ship.axis, draggable);
                 container.append(shipUI);
                 shipsRendered.push(box);
-                placedShips++;
             }
         }));
     }
@@ -234,7 +232,6 @@ function screenController() {
                     const draggable = document.getElementsByClassName("dragging")[0];
                     newLocation.append(draggable);
                     
-                    placedShips++;
                     checkIfGameCanStart();
                     return;
                 }
@@ -265,7 +262,6 @@ function screenController() {
         }
 
         function randomizeShipsPositions() {
-            placedShips = 0;
             playerBoard.randomize(playerShips);
             const newBoard = createPlayerBoard(playerBoard.getBoard(), true);
             checkIfGameCanStart();
@@ -282,7 +278,7 @@ function screenController() {
         }
 
         function checkIfGameCanStart() {
-            if (placedShips >= playerShips.length) {
+            if (playerBoard.getPlacedShipsCount() === playerShips.length) {
                 startGameBtn.removeAttribute("disabled");
                 return true;
             }

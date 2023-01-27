@@ -16,6 +16,8 @@ function gameboard() {
 
     const getBoard = () => board;
 
+    const getPlacedShipsCount = () => ships.length;
+
     function placeShip(coords, length, axis = HORIZONTAL) {
         if (canShipBePlaced(coords, length, axis) === false) return false;
         
@@ -174,6 +176,7 @@ function gameboard() {
 
     return {
         getBoard,
+        getPlacedShipsCount,
         placeShip,
         canShipBePlaced,
         removeShip,

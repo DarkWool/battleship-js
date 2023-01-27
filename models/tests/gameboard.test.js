@@ -141,6 +141,21 @@ describe("canShipBePlaced()", () => {
     });
 });
 
+describe("getPlacedShipsCount()", () => {
+    beforeAll(() => newBoard());
+
+    test("When no ships are placed on the board it should return zero", () => {
+        expect(board.getPlacedShipsCount()).toBe(0);
+    });
+
+    test("Should return the number of ships placed on the board", () => {
+        board.placeShip([2, 3], 5, "horiz");
+        board.placeShip([0, 8], 2, "horiz");
+        board.placeShip([5, 6], 4, "horiz");
+        expect(board.getPlacedShipsCount()).toBe(3);
+    });
+});
+
 describe("receiveAttack()", () => {
     beforeAll(() => {
         newBoard();
