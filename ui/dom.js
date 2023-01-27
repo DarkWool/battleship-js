@@ -12,9 +12,12 @@ function screenController() {
         board.forEach((row, rowIndex) => {
             row.forEach((box, colIndex) => {
                 const div = document.createElement("div");
+                const markerBox = document.createElement("div");
                 div.classList.add("board_box");
+                markerBox.classList.add("board_box-marker");
                 div.dataset.row = rowIndex;
                 div.dataset.col = colIndex;
+                div.append(markerBox);
         
                 callback(div, box, [rowIndex, colIndex]);
         
@@ -102,6 +105,19 @@ function screenController() {
 
         return ship;
     }
+
+    function createLogo() {
+        const pre = document.createElement("pre");
+        pre.classList.add("battleship-logo");
+        pre.textContent = 
+`██████╗  █████╗ ████████╗████████╗██╗     ███████╗███████╗██╗  ██╗██╗██████╗ 
+██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██║     ██╔════╝██╔════╝██║  ██║██║██╔══██╗
+██████╔╝███████║   ██║      ██║   ██║     █████╗  ███████╗███████║██║██████╔╝
+██╔══██╗██╔══██║   ██║      ██║   ██║     ██╔══╝  ╚════██║██╔══██║██║██╔═══╝ 
+██████╔╝██║  ██║   ██║      ██║   ███████╗███████╗███████║██║  ██║██║██║     
+╚═════╝ ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝     `;
+        return pre;
+    }
         
     function placementScreen() {
         let axis = HORIZONTAL;
@@ -110,30 +126,32 @@ function screenController() {
 
         const placementBoard = document.getElementsByClassName("placement_board")[0];
         const availableShips = document.getElementsByClassName("ships_available")[0];
-        const startGameBtn = document.getElementsByClassName("start-btn")[0];
+        const startGameBtn = document.getElementsByClassName("btn-start")[0];
 
 
         function render() {
             document.body.innerHTML = "";
-
+            const mainContainer = document.createElement("div");
             const placementSection = document.createElement("section");
-            const startGameSection = document.createElement("section");
-
+            
             const instructionsContainer = document.createElement("div");
+            const battleshipLogo = createLogo();
             const instructionsTitle = document.createElement("h2");
 
             const boardContainer = document.createElement("div");
-
+            
             const shipsSection = document.createElement("div");
-            const shipsTitle = document.createElement("h2");
+            const availableShipsTitle = document.createElement("h2");
             const shipsBtns = document.createElement("div");
             const changeAxisBtn = document.createElement("button");
             const randomizeBtn = document.createElement("button");
             const availableShips = document.createElement("div");
-            const startGameBtn = document.createElement("button");
 
-            instructionsTitle.textContent = "Instructions";
-            shipsTitle.textContent = "Ships available";
+            const startGameSection = document.createElement("div");
+            const startGameBtn = document.createElement("button");
+            
+            instructionsTitle.textContent = "How to play?";
+            availableShipsTitle.textContent = "Available ships";
             changeAxisBtn.textContent = "Change Axis";
             randomizeBtn.textContent = "Randomize";
             startGameBtn.textContent = "START GAME";
@@ -142,8 +160,8 @@ function screenController() {
             startGameBtn.type = "button";
             startGameBtn.setAttribute("disabled", "");
             instructionsContainer.insertAdjacentHTML(
-            "afterbegin",
-            `<p>
+                "afterbegin",
+                `<p>
                     Suspendisse pharetra ipsum eu erat commodo, a faucibus elit volutpat. Nulla purus nibh, pretium et sapien quis, maximus
                     fermentum ipsum. Donec sagittis dui tellus, at rhoncus lectus viverra finibus. In viverra ante nec nisl congue, nec
                     tempus ex porta. Nam a diam sit amet turpis dignissim efficitur. Cras vitae pharetra ligula, ut faucibus nisl. Donec
@@ -162,16 +180,18 @@ function screenController() {
                 </p>`
             );
 
+            mainContainer.classList.add("margin-auto-y");
             document.body.classList.add("body-flex", "content-margin");
             placementSection.classList.add("game_placement");
+            battleshipLogo.classList.add("instructions_logo");
             boardContainer.classList.add("placement_board", "board");
             shipsSection.classList.add("placement_ships");
             shipsBtns.classList.add("ships_actions");
             availableShips.classList.add("ships_available");
-            changeAxisBtn.classList.add("primary-btn");
-            randomizeBtn.classList.add("secondary-btn");
-            startGameSection.classList.add("game_start");
-            startGameBtn.classList.add("primary-btn", "start-btn");
+            changeAxisBtn.classList.add("btn-primary");
+            randomizeBtn.classList.add("btn-secondary-dark");
+            startGameSection.classList.add("placement_start");
+            startGameBtn.classList.add("btn-primary", "btn-start");
 
             // Listeners
             attachBoardListeners(boardContainer);
@@ -184,13 +204,14 @@ function screenController() {
             };
 
             boardContainer.append(createPlayerBoard(playerBoard.getBoard(), true));
-            instructionsContainer.prepend(instructionsTitle);
+            instructionsContainer.prepend(battleshipLogo, instructionsTitle);
             shipsBtns.append(changeAxisBtn, randomizeBtn);
-            shipsSection.append(shipsTitle, shipsBtns, availableShips);
-            placementSection.append(instructionsContainer, boardContainer, shipsSection);
+            shipsSection.append(shipsBtns, availableShipsTitle, availableShips);
             startGameSection.append(startGameBtn);
+            placementSection.append(instructionsContainer, boardContainer, shipsSection, startGameSection);
+            mainContainer.append(placementSection);
 
-            document.body.prepend(placementSection, startGameSection);
+            document.body.prepend(mainContainer);
         }
 
         function attachBoardListeners(board) {
@@ -287,13 +308,14 @@ function screenController() {
 
     function gameScreen() {
         const MARKER = "●";
+        const HIT_MARKER = "X";
         const boards = [];
         let isComputerTurn = false;
         let currPlayer;
 
         render();
 
-        const turn = document.getElementsByClassName("game_turn")[0];
+        const turn = document.getElementById("turnStatus");
         const winModal = document.getElementsByClassName("game_win-modal")[0];
         const winMessageModal = winModal.getElementsByClassName("win_msg")[0];
         const winMessageTitle = winMessageModal.getElementsByClassName("win_msg-title")[0];
@@ -302,32 +324,40 @@ function screenController() {
         function render() {
             document.body.innerHTML = "";
             document.body.classList.add("body-flex");
-            document.body.insertAdjacentHTML("afterbegin", `
-                <section class="game content-margin">
-                    <div class="game_header">
-                        <h1>Battleship Game</h1>
-                    </div>
-                    <div class="game_turn"></div>
-                    <div class="game_boards"></div>
-                    <div class="game_win-modal">
-                        <div class="dark-overlay"></div>
-                        <div class="win_msg">
-                            <h2 class="win_msg-title"></h2>
-                            <p>Want to play again?</p>
-                            <button type="button" class="restart-btn">
-                                RESTART
-                            </button>
-                            
-                            <img class="win_msg-img"
-                                src="./images/deco-ship.png"
-                                alt="A warship in the sea">
-                        </div>
-                    </div>
-                </section>
-            `);
+            const gameSection = document.createElement("section");
+            const gameHeader = document.createElement("div");
+            const battleshipLogo = createLogo();
+            gameSection.classList.add("game", "content-margin");
+            gameHeader.classList.add("game_header");
+            battleshipLogo.classList.add("game_header-logo");
 
-            const gameBoardsSection = document.body.getElementsByClassName("game_boards")[0];
-            renderBoards(gameBoardsSection);
+            gameSection.innerHTML += `
+                <div class="game_status">
+                    <span class="accent-color">STATUS:</span>
+                    <p id="turnStatus"></p>
+                </div>
+                <div class="game_boards"></div>
+                <div class="game_win-modal">
+                    <div class="dark-overlay"></div>
+                    <div class="win_msg">
+                        <h2 class="win_msg-title"></h2>
+                        <p>Want to play again?</p>
+                        <button type="button" class="btn-primary">
+                            RESTART GAME
+                        </button>
+                        
+                        <img class="win_msg-img"
+                            src="./images/deco-ship.png"
+                            alt="A warship in the sea">
+                    </div>
+                </div>
+            `;
+
+            gameHeader.append(battleshipLogo);
+            gameSection.prepend(gameHeader);
+            document.body.append(gameSection);
+            const gameboardsSection = document.body.getElementsByClassName("game_boards")[0];
+            renderBoards(gameboardsSection);
         }
         
         function renderBoards(boardsSection) {
@@ -340,6 +370,7 @@ function screenController() {
                 
                 const boardContainer = document.createElement("div");
                 boardContainer.classList.add("board");
+                if (boardIndex !== 0) boardContainer.classList.add("enemy");
                 boardContainer.append(boardUI);
                 boardsSection.append(boardContainer);
 
@@ -390,9 +421,10 @@ function screenController() {
         };
 
         const handleTurnResult = (turnResult, box, board) => {
-            box.textContent = MARKER;
+            const markerBox = box.getElementsByClassName("board_box-marker")[0];
 
             if (turnResult.shipHit) {
+                markerBox.textContent = HIT_MARKER;
                 box.classList.add("hit");
                 if (turnResult.adjacentCoords) {
                     turnResult.adjacentCoords.forEach(coords => {
@@ -402,6 +434,7 @@ function screenController() {
                     });
                 }
             }
+            else markerBox.textContent = MARKER;
         };
 
         const showWinMessage = () => {
