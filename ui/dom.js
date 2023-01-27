@@ -360,6 +360,7 @@ function screenController() {
                     
                     handleTurnResult(turn, e.currentTarget, boards[1]);
                     e.currentTarget.classList.add("not-available");
+                    if (turn.isGameWon) return showWinMessage();
                     isComputerTurn = true;
                     
                     updateTurn();
@@ -381,6 +382,7 @@ function screenController() {
                 const coords = players[1].getLastCoords;
                 const boxNumber = coords[0] * 10 + coords[1];
                 handleTurnResult(turn, boards[0].children[boxNumber], boards[0]);
+                if (turn.isGameWon) return showWinMessage();
                 
                 isComputerTurn = false;
                 updateTurn();
@@ -400,7 +402,6 @@ function screenController() {
                     });
                 }
             }
-            if (turnResult.isGameWon) return showWinMessage();
         };
 
         const showWinMessage = () => {
