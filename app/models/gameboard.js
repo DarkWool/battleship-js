@@ -62,14 +62,21 @@ function gameboard() {
     function removeShip(coords) {
         if (!areCoordsValid(coords)) return null;
 
-        const shipToRemove = board[coords[0]][coords[1]];
-        board.forEach((row, rowIndex) => {
-            row.forEach((box, boxIndex) => {
-                if (box === shipToRemove) board[rowIndex][boxIndex] = "";
-            });
-        });
+        const obj = board[coords[0]][coords[1]];
+        const beginningCoords = obj.beginningCoords;
+        const shipLen = obj.ship.length;
 
-        ships.splice(ships.indexOf(shipToRemove), 1);
+        if (obj.ship.axis === HORIZONTAL) {
+            for (let i = 0; i < shipLen; i++) {
+                board[beginningCoords[0]][beginningCoords[1] + i] = "";
+            }
+        } else {
+            for (let i = 0; i < shipLen; i++) {
+                board[beginningCoords[0] + i][beginningCoords[1]] = "";
+            }
+        }
+
+        ships.splice(ships.indexOf(obj), 1);
     }
 
     function receiveAttack(coords) {
