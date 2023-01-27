@@ -370,7 +370,8 @@ function screenController() {
 
         const updateTurn = () => {
             currPlayer = game.getCurrentPlayer();
-            turn.textContent = `${currPlayer.name}'s turn`;
+            if (isComputerTurn) turn.textContent = `${currPlayer.name}'s turn`;
+            else turn.textContent = `Your turn`;
         };
 
         const computerTurn = () => {
@@ -381,8 +382,8 @@ function screenController() {
                 const boxNumber = coords[0] * 10 + coords[1];
                 handleTurnResult(turn, boards[0].children[boxNumber], boards[0]);
                 
-                updateTurn();
                 isComputerTurn = false;
+                updateTurn();
             }, 1500);
         };
 
