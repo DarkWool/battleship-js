@@ -289,7 +289,7 @@ function screenController() {
         const MARKER = "●";
         const boards = [];
         let isComputerTurn = false;
-        let playerTurn;
+        let currPlayer;
 
         render();
 
@@ -357,10 +357,10 @@ function screenController() {
                     
                     const turn = game.playTurn(coords);
                     if (!turn) return;
-                    isComputerTurn = true;
                     
                     handleTurnResult(turn, e.currentTarget, boards[1]);
                     e.currentTarget.classList.add("not-available");
+                    isComputerTurn = true;
                     
                     updateTurn();
                     computerTurn();
@@ -369,8 +369,8 @@ function screenController() {
         }
 
         const updateTurn = () => {
-            playerTurn = game.getCurrentPlayer();
-            turn.textContent = `${playerTurn.name}'s turn`;
+            currPlayer = game.getCurrentPlayer();
+            turn.textContent = `${currPlayer.name}'s turn`;
         };
 
         const computerTurn = () => {
@@ -403,7 +403,12 @@ function screenController() {
         };
 
         const showWinMessage = () => {
-            winMessageTitle.textContent = `${playerTurn.name} CONQUERED!`;
+            if (isComputerTurn) {
+                winMessageTitle.textContent = `${currPlayer.name} CONQUERED!`;
+            } else {
+                winMessageTitle.textContent = `You have CONQUERED!`;
+            }
+
             winModal.classList.add("active");
             winMessageModal.classList.add("active");
         };
