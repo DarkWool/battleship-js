@@ -399,6 +399,7 @@ function screenController() {
                     handleTurnResult(turn, e.currentTarget, boards[1]);
                     e.currentTarget.classList.add("not-available");
                     if (turn.isGameWon) return showWinMessage();
+                    if (turn.shipHit) return;
                     isComputerTurn = true;
                     
                     updateTurn();
@@ -421,6 +422,10 @@ function screenController() {
                 const boxNumber = coords[0] * 10 + coords[1];
                 handleTurnResult(turn, boards[0].children[boxNumber], boards[0]);
                 if (turn.isGameWon) return showWinMessage();
+                if (turn.shipHit) {
+                    computerTurn();
+                    return;
+                }
                 
                 isComputerTurn = false;
                 updateTurn();
