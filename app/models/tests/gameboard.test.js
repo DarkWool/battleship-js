@@ -212,6 +212,15 @@ describe("receiveAttack()", () => {
         expect(testBoard[2][1]).toBe("/");
     });
 
+    test("Returns null when the coords have been attacked before or they are invalid", () => {
+        expect(board.receiveAttack([0, 10])).toBe(null);
+        expect(board.receiveAttack([-5, 20])).toBe(null);
+        expect(board.receiveAttack([5, 12])).toBe(null);
+        expect(board.receiveAttack(["saxa", 4])).toBe(null);
+        expect(board.receiveAttack([NaN, NaN])).toBe(null);
+        expect(board.receiveAttack([5, NaN])).toBe(null);
+    });
+
     describe("Returns an object with the following properties", () => {
         beforeAll(() => {
             board = gameboard();
@@ -324,6 +333,13 @@ describe("isBoxAttacked()", () => {
         expect(board.isBoxAttacked([3, 7])).toBe(true);
         expect(board.isBoxAttacked([3, 8])).toBe(true);
         expect(board.isBoxAttacked([3, 9])).toBe(true);
+    });
+
+    test("Returns true for invalid coords / non existent", () => {
+        expect(board.isBoxAttacked([3, 10])).toBe(true);
+        expect(board.isBoxAttacked([3, 20])).toBe(true);
+        expect(board.isBoxAttacked([10, 1])).toBe(true);
+        expect(board.isBoxAttacked([10, 15])).toBe(true);
     });
 });
 

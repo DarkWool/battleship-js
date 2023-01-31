@@ -80,9 +80,11 @@ function gameboard() {
     }
 
     function receiveAttack(coords) {
+        if (isBoxAttacked(coords) === true) return null;
+
         const [coordY, coordX] = coords;
         const result = { shipHit: null };
-
+        
         if (typeof board[coordY][coordX] === "object") {
             const box = board[coordY][coordX];
             const ship = box.ship;
@@ -168,8 +170,12 @@ function gameboard() {
     }
 
     function isBoxAttacked(coords) {
-        const box = board[coords[0]][coords[1]];
-        return (box === MISSED_MARK || box === HIT_MARK) ? true : false;
+        try {
+            const box = board[coords[0]][coords[1]];
+            return (box === MISSED_MARK || box === HIT_MARK || box == null) ? true : false;
+        } catch {
+            return true;
+        }
     }
 
     function areCoordsValid(coords) {
