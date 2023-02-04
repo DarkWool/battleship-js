@@ -20,8 +20,7 @@ describe("length property", () => {
 
     test("Must be a number", () => {
         for (let i = 1; i < 8; i++) {
-            const shipLen = i;
-            testShip = ship(shipLen);
+            testShip = ship(i);
             expect(typeof testShip.length).toEqual("number");
         }
     });
@@ -32,7 +31,7 @@ describe("length property", () => {
         expect(ship(-1000)).toBeFalsy();
     });
 
-    test("When creating a new ship if the length property is NOT a number it shouldn't return an object", () => {
+    test(`Fails to create a new ship when the length specified is NOT a number`, () => {
         expect(ship("5")).toBeFalsy();
         expect(ship(null)).toBeFalsy();
         expect(ship(undefined)).toBeFalsy();
@@ -44,6 +43,8 @@ describe("length property", () => {
 });
 
 describe("axis property", () => {
+    beforeAll(() => testShip = ship(5, HORIZONTAL));
+
     test("Ships must have an 'axis' property", () => {
         expect(testShip).toHaveProperty("axis");
     });
@@ -77,7 +78,7 @@ describe("hit()", () => {
 });
 
 describe("isSunk()", () => {
-    beforeAll(() => testShip = new ship(5));
+    beforeAll(() => testShip = ship(5, HORIZONTAL));
 
     test("Returns false when the number of hits is less than the length of the ship", () => {
         expect(testShip.isSunk()).toBe(false);

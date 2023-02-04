@@ -1,12 +1,10 @@
-import { HORIZONTAL, isNumber } from "./utils.js";
+import { isNumber } from "./utils.js";
 
-function ship(_length, _axis = HORIZONTAL) {
+function ship(_length, _axis) {
     if (!isNumber(_length) || _length <= 0) return;
 
-    let hits = 0;
-
     return {
-        hits,
+        hits: 0,
         get length() {
             return _length;
         },
@@ -18,7 +16,7 @@ function ship(_length, _axis = HORIZONTAL) {
             return this.hits;
         },
         isSunk() {
-            if (this.hits >= _length) return true;
+            if (this.hits >= this.length) return true;
 
             return false;
         },
