@@ -1,7 +1,6 @@
 import { HORIZONTAL, VERTICAL, getRandomCoords } from "./utils.js";
 import { ship } from "./ship.js";
 
-
 function gameboard() {
     const board = [];
     let ships = [];
@@ -17,6 +16,8 @@ function gameboard() {
     const getBoard = () => board;
 
     const getPlacedShipsCount = () => ships.length;
+
+    const getBoxAt = coords => board[coords[0]][coords[1]];
 
     function placeShip(coords, length, axis = HORIZONTAL) {
         if (canShipBePlaced(coords, length, axis) === false) return false;
@@ -52,7 +53,13 @@ function gameboard() {
             (!isHorizontal && (coords[0] + (shipLen - 1) > boardLen))) {
             return false;
         } else {
-            return forEachAdjacentAndShipBox(coords, shipLen, axis, (boxCoords) => {
+            const shipData = {
+                coords,
+                len: shipLen,
+                axis,
+            };
+
+            return forEachAdjacentAndShipBox(shipData, (boxCoords) => {
                 const box = board[boxCoords[0]][boxCoords[1]];
                 if (typeof box === "object") return false;
             });
@@ -95,7 +102,11 @@ function gameboard() {
                 result.beginningCoords = box.beginningCoords;
                 result.ship = box.ship;
                 result.adjacentCoords =
-                    getAndAttackAdjacentBoxes(box.beginningCoords, ship.length, ship.axis);
+                    getAndAttackAdjacentBoxes({
+                        coords: box.beginningCoords,
+                        len: ship.length,
+                        axis: ship.axis
+                    });
             }
             result.shipHit = true;
         } else {
@@ -107,11 +118,11 @@ function gameboard() {
         return result;
     }
 
-    function forEachAdjacentAndShipBox(coords, shipLen, shipAxis, callback) {
-        let y = coords[0] - 1;
-        let x = coords[1] - 1;
-        const finalPos = shipLen + 2;
-        if (shipAxis === HORIZONTAL) {
+    function forEachAdjacentAndShipBox(shipData, callback) {
+        let y = shipData.coords[0] - 1;
+        let x = shipData.coords[1] - 1;
+        const finalPos = shipData.len + 2;
+        if (shipData.axis === HORIZONTAL) {
             for (let i = 0; i < 3; i++) {
                 for (let j = 0; j < finalPos; j++) {
                     try {
@@ -136,9 +147,9 @@ function gameboard() {
         return true;
     }
 
-    function getAndAttackAdjacentBoxes(beginningCoords, shipLen, shipAxis) {
+    function getAndAttackAdjacentBoxes(data) {
         const boxesCoords = [];
-        forEachAdjacentAndShipBox(beginningCoords, shipLen, shipAxis, (coords) => {
+        forEachAdjacentAndShipBox(data, (coords) => {
             if (board[coords[0]][coords[1]] !== "") return;
             board[coords[0]][coords[1]] = MISSED_MARK;
             boxesCoords.push(coords);
@@ -184,8 +195,6 @@ function gameboard() {
             typeof coord === "number" && coord >= 0 && coord <= boardLen
         ));
     }
-
-    const getBoxAt = coords => board[coords[0]][coords[1]];
 
     const areAllShipsSunk = () => ships.every(obj => obj.ship.isSunk());
 
