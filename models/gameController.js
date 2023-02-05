@@ -1,46 +1,40 @@
 import { player } from "./player.js";
 import { computerPlayer } from "./computerPlayer.js";
-import { HORIZONTAL } from "./utils.js";
 
-function gameController() {
-    const playerA = player("Wool");
-    const playerB = computerPlayer("PC");
-    const players = [playerA, playerB];
-    
-    let playerTurn = playerA;
+function gameController(ships) {
+    const players = [];
+    let turn;
 
-    // Predefined coords
-    playerB.board.placeShip([9, 2], 5, HORIZONTAL);
-    playerB.board.placeShip([0, 6], 3, HORIZONTAL);
-    playerB.board.placeShip([6, 1], 4, HORIZONTAL);
-    playerB.board.placeShip([2, 1], 3, HORIZONTAL);
-    playerB.board.placeShip([5, 5], 2, HORIZONTAL);
+    function init() {
+        turn = 0;
+        const mainPlayer = player("DarkWool");
+        const aiPlayer = computerPlayer("Cortana");
+        aiPlayer.board.randomize(ships);
 
-
-    const getPlayers = () => players;
-
-    const getCurrentPlayer = () => playerTurn;
-
-    const playTurn = (coords) => {
-        const currPlayer = getCurrentPlayer();
-        const enemy = players.find(player => player.name !== currPlayer.name);
-        const attack = currPlayer.attack(enemy.board, coords);
-        if (attack == null) return;
-        
-        // Before changing turn check if the curr player has won
-        const isGameWon = checkWin(enemy.board);
-        if (!isGameWon && attack.shipHit === false) switchTurn();
-
-        return {
-            ...attack,
-            isGameWon,
-        };
+        players[0] = mainPlayer;
+        players[1] = aiPlayer;
     };
 
-    const playComputerTurn = () => {
-        const currPlayer = getCurrentPlayer();
-        const enemy = players.find(player => player.name !== currPlayer.name);
-        const attack = playerB.attack(playerA.board);
+    const getCurrentPlayer = () => players[turn];
+
+    function playTurn(coords) {
+        if (isComputerTurn()) return;
+
+        const player = getCurrentPlayer();
+        const enemy = (turn === 0) ? players[1] : players[0];
+        return handleAttack(player, enemy, coords);
+    };
+
+    function playComputerTurn() {
+        const player = players[1];
+        const enemy = players[0];
+        return handleAttack(player, enemy);
+    };
+
+    function handleAttack(player, enemy, coords) {
+        const attack = (coords) ?
+            player.attack(enemy.board, coords) :
+            player.attack(enemy.board);
         if (attack == null) return;
 
         const isGameWon = checkWin(enemy.board);
@@ -52,20 +46,23 @@ function gameController() {
         };
     };
 
-    const switchTurn = () => {
-        playerTurn = (playerTurn === players[0]) ?
-            players[1] :
-            players[0];
-    };
+    const isComputerTurn = () => (turn === 1);
+
+    const switchTurn = () => turn = (turn === 0) ? 1 : 0;
     
     const checkWin = (board) => board.areAllShipsSunk();
 
-    
+    init();
+
     return {
-        getPlayers,
+        init,
+        get getPlayers() {
+            return players;
+        },
         getCurrentPlayer,
         playTurn,
-        playComputerTurn
+        playComputerTurn,
+        isComputerTurn,
     };
 }
 
