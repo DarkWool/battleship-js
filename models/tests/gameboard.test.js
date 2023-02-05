@@ -1,6 +1,6 @@
 import { gameboard } from "../gameboard.js";
 
-let board, testBoard;
+let board, testBoard, attackResult;
 function newBoard() {
     board = gameboard();
     testBoard = board.getBoard();
@@ -29,6 +29,17 @@ describe("getBoard()", () => {
 
 describe("placeShip()", () => {
     beforeEach(() => newBoard());
+
+    test("Creates an object with 'begginingCoords' and 'ship' properties at the ship coords", () => {
+        board.placeShip([2, 3], 3, "horiz");
+        
+        expect(testBoard[2][3]).toHaveProperty("beginningCoords");
+        expect(testBoard[2][4]).toHaveProperty("beginningCoords");
+        expect(testBoard[2][5]).toHaveProperty("beginningCoords");
+        expect(testBoard[2][3]).toHaveProperty("ship");
+        expect(testBoard[2][4]).toHaveProperty("ship");
+        expect(testBoard[2][5]).toHaveProperty("ship");
+    });
 
     test("Places a ship on the board horizontally", () => {
         expect(board.placeShip([2, 3], 5, "horiz")).toBe(true);
@@ -148,7 +159,7 @@ describe("getPlacedShipsCount()", () => {
         expect(board.getPlacedShipsCount()).toBe(0);
     });
 
-    test("Should return the number of ships placed on the board", () => {
+    test("Must return the number of ships placed on the board", () => {
         board.placeShip([2, 3], 5, "horiz");
         board.placeShip([0, 8], 2, "horiz");
         board.placeShip([5, 6], 4, "horiz");
@@ -221,30 +232,55 @@ describe("receiveAttack()", () => {
         expect(board.receiveAttack([5, NaN])).toBe(null);
     });
 
-    describe("Returns an object with the following properties", () => {
+    describe("Returns an object with a 'shipHit' prop", () => {
         beforeAll(() => {
-            board = gameboard();
-            testBoard = board.getBoard();
+            newBoard();
             board.placeShip([3, 6], 4, "horiz");
             board.placeShip([0, 0], 2, "vert");
         });
 
-        test("'shipHit' prop value is false for a missed shot", () => {
+        test("When it's a missed shot its value must be false", () => {
             const response = { shipHit: false };
             expect(board.receiveAttack([6, 6])).toMatchObject(response);
-            expect(board.receiveAttack([2, 0])).toMatchObject(response);
             expect(board.receiveAttack([1, 8])).toMatchObject(response);
             expect(board.receiveAttack([8, 1])).toMatchObject(response);
             expect(board.receiveAttack([9, 0])).toMatchObject(response);
         });
-    
-        test("'shipHit' prop value is true when a ship is hit", () => {
+
+        test("When a ship is hit its value must be true", () => {
             const response = { shipHit: true };
             expect(board.receiveAttack([3, 6])).toMatchObject(response);
             expect(board.receiveAttack([3, 7])).toMatchObject(response);
             expect(board.receiveAttack([3, 9])).toMatchObject(response);
             expect(board.receiveAttack([0, 0])).toMatchObject(response);
-            expect(board.receiveAttack([1, 0])).toMatchObject(response);
+        });
+    });
+
+    describe("Returns an object when it sunks a ship with", () => {
+        describe("'Ship' prop", () => {
+            test("Must match the ship placed at the attack coords", () => {
+                const ship = board.getBoxAt([1, 0]).ship;
+                attackResult = board.receiveAttack([1, 0]);
+                expect(attackResult).toHaveProperty("ship");
+                expect(attackResult.ship).toMatchObject(ship);
+            });
+        });
+
+        describe("'BeginningCoords' prop", () => {
+            test("Must equal to the coords where the ship was originally placed", () => {
+                const attackResult = board.receiveAttack([3, 8]);
+                expect(attackResult.beginningCoords[0]).toEqual(3);
+                expect(attackResult.beginningCoords[1]).toEqual(6);
+            });
+        });
+
+        describe("'AdjacentCoords' prop", () => {
+            test("Must store all the ship's adjacent coords", () => {
+                expect(attackResult.adjacentCoords).toContainEqual([0, 1]);
+                expect(attackResult.adjacentCoords).toContainEqual([1, 1]);
+                expect(attackResult.adjacentCoords).toContainEqual([2, 0]);
+                expect(attackResult.adjacentCoords).toContainEqual([2, 1]);
+            });
         });
     });
 });
