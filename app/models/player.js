@@ -4,10 +4,7 @@ function player(_name) {
     if (typeof _name !== "string" || _name === "") return null;
 
     const _board = gameboard();
-    const attack = (enemyBoard, coords) => {
-        if (enemyBoard.isBoxAttacked(coords) === false)
-            return enemyBoard.receiveAttack(coords);
-    };
+    const attack = (enemyBoard, coords) => enemyBoard.receiveAttack(coords);
 
     return {
         get name() {
