@@ -39,7 +39,7 @@ function gameScreen(game, players) {
                     </button>
                     
                     <img class="win_msg-img"
-                        src="./images/deco-ship.png"
+                        src="./ui/images/deco-ship.png"
                         alt="A warship in the sea">
                 </div>
             </div>
