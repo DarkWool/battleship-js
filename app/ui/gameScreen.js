@@ -20,9 +20,8 @@ function gameScreen(game, players) {
         const gameSection = document.createElement("section");
         const gameHeader = document.createElement("div");
         const battleshipLogo = createLogo();
-        gameSection.classList.add("game", "content-margin");
+        gameSection.classList.add("game", "margin-auto-x");
         gameHeader.classList.add("game_header");
-        battleshipLogo.classList.add("game_header-logo");
 
         gameSection.innerHTML += `
             <div class="game_status flash">

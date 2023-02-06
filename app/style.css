@@ -1,4 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=Inconsolata:wght@200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Courier+Prime&family=Heebo:wght@100;200;300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&family=Inconsolata:wght@200;300;400;500;600;700;800;900&display=swap");
+
+@font-face {
+  font-family: "DejaVu Sans Mono Bold";
+  src: url("./fonts/DejaVuSansMono-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: bold;
+}
 
 *,
 *::before,
@@ -7,7 +14,7 @@
 }
 
 ::selection {
-  background-color: hsla(112.4, 95.7%, 27.6%, 0.6);
+  background-color: hsla(95.8, 98.3%, 22.7%, 0.6);
   color: white;
 }
 
@@ -37,7 +44,7 @@ html {
 
 body {
   min-height: 100%;
-  background-color: hsl(105, 5%, 4.5%);
+  background-color: hsl(105, 5%, 4%);
   font-family: Heebo, sans-serif;
   font-size: 1.4rem;
   line-height: 1.35;
@@ -67,6 +74,16 @@ p + *  {
 
 li + li {
   margin-top: 10px;
+}
+
+a {
+  text-decoration: none;
+  color: var(--accent);
+  transition: 0.2s color ease;
+}
+
+a:hover {
+  color: hsl(0, 100%, 82%);
 }
 
 
@@ -102,11 +119,6 @@ button:disabled {
   padding: 15px 30px;
 }
 
-.btn-primary:hover {
-  background-color: var(--accent);
-  color: black;
-}
-
 .btn-secondary-dark {
   border: 3px solid white;
   box-shadow: -4px 5px white;
@@ -115,37 +127,60 @@ button:disabled {
   padding: 15px 30px;
 }
 
-.btn-secondary-dark:hover {
-  background-color: white;
-  color: black;
-}
-
 .btn-start {
   padding: 20px 40px;
   animation-delay: 0.7s;
+}
+
+@media (hover: hover) {
+  .btn-primary:hover {
+    background-color: var(--accent);
+    color: black;
+  }
+
+  .btn-secondary-dark:hover {
+    background-color: white;
+    color: black;
+  }
 }
 
 
 
 
 .battleship-logo {
-  font-family: revert;
+  font-family: "DejaVu Sans Mono Bold", monospace;
   font-size: 0.8rem;
-  color: white;
+  font-weight: inherit;
+  color: var(--accent);
 }
 
 /* ----- Placement screen ----- */
+.game_logo {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding-top: 30px;
+}
+
 .game_placement {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  margin: auto;
   column-gap: 75px;
   row-gap: 25px;
+  padding: 30px 0;
 }
 
-.instructions_logo {
-  max-width: 350px;
-  margin-bottom: 30px;
+.placement_instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.instructions_about {
+  padding: 15px;
+  border: 1px solid hsl(0, 0%, 31%);
+  background-color: hsl(120, 4%, 5%);
+  text-align: center;
 }
 
 /* Board section */
@@ -154,10 +189,6 @@ button:disabled {
 }
 
 /* Ships section */
-.placement_ships > * {
-  margin-bottom: 20px;
-}
-
 .ships_actions {
   display: flex;
   gap: 20px;
@@ -169,7 +200,7 @@ button:disabled {
 }
 
 .ships_available {
-  min-height: 450px;
+  min-height: 400px;
   display: flex;
   gap: 15px;
   flex-direction: column;
@@ -202,6 +233,7 @@ button:disabled {
   flex-direction: column;
   justify-content: center;
   padding-top: 50px;
+  padding-bottom: 50px;
 }
 
 .game_header {
@@ -209,10 +241,6 @@ button:disabled {
   margin-right: auto;
   margin-bottom: 30px;
   text-align: center;
-}
-
-.game_header-logo {
-  color: var(--accent);
 }
 
 .game_status {
@@ -255,12 +283,18 @@ button:disabled {
 }
 
 .board {
-  background-color: hsla(120, 43.8%, 6.3%, 0.4);
+  background-color: hsla(120, 43.8%, 6.3%, 0.25);
 }
 
 .board-enemy {
   background: none;
   border: 2px solid hsl(0, 0%, 100%);
+}
+
+.placement_board .board_box,
+.placement_board .ship > div {
+  width: 40px;
+  height: 40px;
 }
 
 .board_box,
@@ -475,6 +509,11 @@ button:disabled {
   margin-bottom: auto;
 }
 
+.margin-auto-x {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .content-margin {
   margin-right: auto;
   margin-left: auto;
@@ -488,7 +527,8 @@ button:disabled {
   left: 0;
   position: fixed;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
+  height: 100vh;
   background-color: hsla(103, 26%, 5%, 0.8);
 }
 
@@ -503,9 +543,10 @@ button:disabled {
 
 
 
+/* Queries */
 @media screen and (max-width: 1300px) {
   .game {
-    padding-top: 30px;
+    padding-top: 50px;
   }
 
   .game_status {
@@ -522,6 +563,8 @@ button:disabled {
     font-size: 0.6rem;
   }
 
+  .placement_board .board_box,
+  .placement_board .ship > div,
   .board_box,
   .ship > div {
     width: 35px;
@@ -536,18 +579,44 @@ button:disabled {
   .board_box::after {
     font-size: 1.2rem;
   }
+
+  .win_msg {
+    max-width: 525px;
+    padding: 80px;
+  }
+
+  .win_msg-title {
+    font-size: 3rem;
+  }
+
+  .win_msg-img {
+    max-width: 400px;
+    transform: translateX(-40%) translateY(35%);
+  }
+
+  .win_msg > p {
+    margin-bottom: 20px;
+  }
 }
 
 @media screen and (max-width: 1140px) {
+  h2 {
+    font-size: 1.6rem;
+  }
+
   .game_placement {
     grid-template-rows: auto 1fr auto;
     grid-template-columns: 1fr 1fr;
+    padding-top: 50px;
+    gap: 30px;
   }
 
   .placement_instructions {
     grid-column: 1 / 3;
     max-width: 90ch;
     margin: auto;
+    margin-top: 25px;
+    order: 4;
   }
 
   .placement_start {
@@ -559,15 +628,34 @@ button:disabled {
   }
 
   .ships_available {
-    min-height: 350px;
+    min-height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 }
 
 @media screen and (max-width: 960px) {
+  button {
+    font-size: 1.4rem;
+  }
+
+  .game {
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+
   .game_boards {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 70px;
+  }
+
+  .placement_board .board_box,
+  .placement_board .ship > div,
+  .board_box,
+  .ship > div {
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -576,22 +664,66 @@ button:disabled {
     font-size: 1.6rem;
   }
 
+  .battleship-logo {
+    font-size: 0.4rem;
+  }
+
   .game_placement {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto 1fr auto;
+    row-gap: 30px;
+    padding: 30px 0;
   }
 
-  .instructions_logo {
-    max-width: 100%;
-    text-align: center;
+  .placement_instructions {
+    grid-column: 1 / 2;
+    margin-top: 25px;
   }
 
   .placement_board {
     width: auto;
+    margin-top: 20px;
+  }
+
+  .placement_ships {
+    order: -1;
+    text-align: center;
+  }
+
+  .ships_actions {
+    max-width: 200px;
+    margin: auto;
+  }
+
+  .ships_actions > .btn-primary,
+  .ships_available-title,
+  .ships_available {
+    display: none;
   }
 
   .placement_start {
     grid-column: initial;
+  }
+
+  .game_logo {
+    padding-top: 30px;
+  }
+
+  .game.content-margin {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .game_header {
+    margin-bottom: 15px;
+  }
+
+  .game_status {
+    padding: 12px;
+  }
+
+  .game_boards {
+    row-gap: 50px;
   }
 
   .board {
@@ -599,19 +731,29 @@ button:disabled {
     grid-template-rows: repeat(10, auto);
   }
 
+  .placement_board .board_box,
+  .placement_board .ship > div,
   .board_box,
   .ship > div {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
-  .ships_available {
-    display: none;
+  .win_msg {
+    padding: 70px 60px;
   }
 
-  .ships_actions {
-    max-width: 400px;
-    margin: auto;
+  .win_msg-title {
+    font-size: 2.4rem;
+  }
+
+  .win_msg > p {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+
+  .win_msg-img {
+    max-width: 250px;
   }
 
   button {

@@ -17,7 +17,7 @@ function placementScreen(playerBoard, ships) {
         const placementSection = document.createElement("section");
         
         const instructionsContainer = document.createElement("div");
-        const battleshipLogo = createLogo();
+        const logoContainer = document.createElement("div");
 
         const boardContainer = document.createElement("div");
         const boardUI = createPlayerBoard(playerBoard);
@@ -44,28 +44,36 @@ function placementScreen(playerBoard, ships) {
         startGameBtn.setAttribute("disabled", "");
         instructionsContainer.insertAdjacentHTML(
             "afterbegin",
-            `<h2>What is Battleship?</h2>
+            `<div>
+            <h2>What is Battleship?</h2>
             <p>
                 Battleship is a classic two-player strategy game played on a gameboard. The goal of the game is to sink all of your opponent's ships by correctly guessing their positions on the grid.<br>
                 Each player takes turns firing shots at their opponent's grid, with the winner being the player who sinks all of their opponent's ships first, hence why you have to strategically place your ships in a way that makes them difficult to hit.
             </p>
+            </div>
+            <div>
             <h2>How to place your ships?</h2>
             <ul>
                 <li>Drag and drop every ship on the board or press the <span class="txt-600">'Randomize'</span> button to place them quickly.</li>
                 <li>A space of <span class="txt-600">1 box</span> must exist between every ship, otherwise you won't be able to place your ship.</li>
                 <li>Before placing a ship you can change its orientation with the <span class="txt-600">'Change Axis'</span> button.</li>
-                <li>To change the orientation of a ship that's already placed on the board, you can click on it, beware that if the ship turns red it means that it can't be rotated due to unsufficient space to perform it.</li>
-            </ul>`
+                <li>To change the orientation of a ship that's already placed on the board, you can click on it, beware that if the ship turns red it means that it can't be rotated due to unsufficient space.</li>
+            </ul>
+            </div>
+            <div class="instructions_about">
+            <p>Made by <a href="https://github.com/DarkWool/battleship-js" target="_blank">DarkWool</a> with love ❤️ and patience!</p>
+            </div>`
         );
 
-        document.body.classList.add("body-flex", "content-margin");
-        mainContainer.classList.add("margin-auto-y");
-        placementSection.classList.add("game_placement", "fadeInDown", "animated");
-        instructionsContainer.classList.add("placement_instructions");
-        battleshipLogo.classList.add("instructions_logo");
+        document.body.classList.add("body-flex");
+        mainContainer.classList.add("margin-auto-y", "fadeInDown", "animated");
+        logoContainer.classList.add("game_logo");
+        placementSection.classList.add("game_placement");
+        instructionsContainer.classList.add("placement_instructions", "margin-auto-y");
         boardContainer.classList.add("placement_board");
         shipsSection.classList.add("placement_ships");
         shipsBtns.classList.add("ships_actions");
+        availableShipsTitle.classList.add("ships_available-title");
         availableShips.classList.add("ships_available");
         changeAxisBtn.classList.add("btn-primary");
         randomizeBtn.classList.add("btn-secondary-dark");
@@ -82,13 +90,13 @@ function placementScreen(playerBoard, ships) {
             availableShips.append(shipUI);
         };
 
-        instructionsContainer.prepend(battleshipLogo);
         boardContainer.append(boardUI);
         shipsBtns.append(changeAxisBtn, randomizeBtn);
         shipsSection.append(shipsSectionTitle, shipsBtns, availableShipsTitle, availableShips);
         startGameSection.append(startGameBtn);
         placementSection.append(instructionsContainer, boardContainer, shipsSection, startGameSection);
-        mainContainer.append(placementSection);
+        logoContainer.append(createLogo());
+        mainContainer.append(logoContainer, placementSection);
 
         document.body.prepend(mainContainer);
     }
