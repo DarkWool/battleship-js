@@ -16,13 +16,15 @@ function gameScreen(game, players) {
     // Methods
     function render() {
         document.body.innerHTML = "";
-        document.body.classList.add("body-flex");
+        
         const gameSection = document.createElement("section");
         const gameHeader = document.createElement("div");
         const battleshipLogo = createLogo();
+
+        document.body.classList.add("body-flex");
         gameSection.classList.add("game", "margin-auto-x");
         gameHeader.classList.add("game_header");
-
+        
         gameSection.innerHTML += `
             <div class="game_status flash">
                 <span class="accent-color">STATUS:</span>
@@ -34,7 +36,7 @@ function gameScreen(game, players) {
                 <div class="win_msg">
                     <h2 class="win_msg-title"></h2>
                     <p>Want to play again?</p>
-                    <button type="button" class="btn-primary">
+                    <button type="button" id="restartGame" class="btn-primary">
                         RESTART GAME
                     </button>
                     
@@ -48,6 +50,12 @@ function gameScreen(game, players) {
         gameHeader.append(battleshipLogo);
         gameSection.prepend(gameHeader);
         document.body.append(gameSection);
+        
+        const restartBtn = document.getElementById("restartGame");
+        restartBtn.addEventListener("click", () => {
+            PubSub.publish("RESTART GAME");
+        });
+        
         const gameboardsSection = document.body.getElementsByClassName("game_boards")[0];
         renderBoards(gameboardsSection);
     }

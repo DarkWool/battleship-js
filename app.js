@@ -19,6 +19,7 @@ import { gameScreen } from "./ui/gameScreen.js";
     
     PubSub.subscribe("START GAME", initPlacementScreen);
     PubSub.subscribe("START GAME SCREEN", initGameScreen);
+    PubSub.subscribe("RESTART GAME", initPlacementScreen);
     
     PubSub.publish("START GAME");
 })();
