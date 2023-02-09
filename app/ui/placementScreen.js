@@ -84,11 +84,14 @@ function placementScreen(playerBoard, ships) {
         attachBoardListeners(boardContainer);
         changeAxisBtn.addEventListener("click", changeShipsAxis);
         randomizeBtn.addEventListener("click", randomizeShipsPositions);
+        startGameBtn.addEventListener("click", startGame);
+
         for (const shipLen of ships) {
             const shipUI = renderShip(shipLen, HORIZONTAL);
             attachShipListeners(shipUI, playerBoard);
             availableShips.append(shipUI);
         };
+
 
         boardContainer.append(boardUI);
         shipsBtns.append(changeAxisBtn, randomizeBtn);
@@ -191,17 +194,10 @@ function placementScreen(playerBoard, ships) {
         }
     }
 
-    function handleGameStart(initGameScreen) {
-        startGameBtn.addEventListener("click", () => {
-            if (!checkIfGameCanStart()) return;
+    function startGame() {
+        if (!checkIfGameCanStart()) return;
 
-            initGameScreen();
-        }); 
-    }
-
-
-    return {
-        handleGameStart,
+        PubSub.publish("START GAME SCREEN");
     };
 }
 

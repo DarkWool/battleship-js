@@ -1,8 +1,24 @@
 import { gameController } from "./models/gameController.js";
-import { viewController } from "./ui/ui-controller.js";
+import { placementScreen } from "./ui/placementScreen.js";
+import { gameScreen } from "./ui/gameScreen.js";
 
 (() => {
-    const ships = [3, 2, 5, 6, 2, 2, 1];
+    const ships = [3, 2, 1];
     const game = gameController(ships);
-    const view = viewController(game, ships);
+
+    const initPlacementScreen = () => {
+        game.init();
+        const mainPlayer = game.getPlayers[0];
+        placementScreen(mainPlayer.board, ships);
+    };
+
+    const initGameScreen = () => {
+        const players = game.getPlayers;
+        const gameUI = gameScreen(game, players);
+    };
+    
+    PubSub.subscribe("START GAME", initPlacementScreen);
+    PubSub.subscribe("START GAME SCREEN", initGameScreen);
+    
+    PubSub.publish("START GAME");
 })();
