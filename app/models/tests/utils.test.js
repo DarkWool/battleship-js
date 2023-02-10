@@ -1,14 +1,14 @@
 import { getRandomCoords, isNumber } from "../utils";
 
 describe("isNumber()", () => {
-    test("Returns true when the argument passed in is a number", () => {
+    test("Returns true when the argument is a number", () => {
         expect(isNumber(50)).toBe(true);
         expect(isNumber(0)).toBe(true);
         expect(isNumber(24)).toBe(true);
         expect(isNumber(-5)).toBe(true);
     });
     
-    test("Returns false when the argument passed in is not a number", () => {
+    test("Returns false when the argument is not a number", () => {
         expect(isNumber("I'm Batman")).toBe(false);
         expect(isNumber("")).toBe(false);
         expect(isNumber(null)).toBe(false);

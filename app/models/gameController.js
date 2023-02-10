@@ -28,7 +28,10 @@ function gameController(ships) {
     function playComputerTurn() {
         const player = players[1];
         const enemy = players[0];
-        return handleAttack(player, enemy);
+        return {
+            ...handleAttack(player, enemy),
+            coords: player.getLastCoords,
+        };
     };
 
     function handleAttack(player, enemy, coords) {

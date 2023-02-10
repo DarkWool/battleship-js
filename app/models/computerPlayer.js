@@ -84,7 +84,7 @@ function computerPlayer(name = "PC") {
             lastMove.shipHit = (attackRes.shipHit === true) ? true : false;
         }
 
-        // If ship is sunk return to attack a random position...
+        // If the ship is sunk go back to attack a random position...
         if (attackRes.adjacentCoords) shipFound.clear();
         
         lastMove.coords = coords;
