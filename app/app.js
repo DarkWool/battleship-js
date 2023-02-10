@@ -3,7 +3,7 @@ import { placementScreen } from "./ui/placementScreen.js";
 import { gameScreen } from "./ui/gameScreen.js";
 
 (() => {
-    const ships = [3, 2, 1];
+    const ships = [5, 3, 3, 2, 2, 1];
     const game = gameController(ships);
 
     const initPlacementScreen = () => {
