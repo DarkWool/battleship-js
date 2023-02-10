@@ -108,8 +108,9 @@ function gameScreen(game, players) {
     const computerTurn = () => {
         setTimeout(() => {
             const turn = game.playComputerTurn();
-            const coords = players[1].getLastCoords;
-            const box = boards[0].querySelector(`[data-row="${coords[0]}"][data-col="${coords[1]}"]`);
+            const box = boards[0].querySelector(
+                `[data-row="${turn.coords[0]}"][data-col="${turn.coords[1]}"]`
+            );
             handleTurnResult(turn, box, boards[0]);
             if (turn.isGameWon) return showWinMessage();
             if (turn.shipHit) {
