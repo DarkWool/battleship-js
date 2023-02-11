@@ -60,9 +60,9 @@ function placementScreen(playerBoard, ships) {
         <h2>How to place your ships?</h2>
         <ul>
           <li>Drag and drop every ship on the board or press the <span class="txt-600">'Randomize'</span> button to place them quickly.</li>
-          <li>A space of <span class="txt-600">1 box</span> must exist between every ship, otherwise you won't be able to place your ship.</li>
+          <li>A space of <span class="txt-600">1 box</span> must exist between every ship, otherwise, you won't be able to place it.</li>
           <li>Before placing a ship you can change its orientation with the <span class="txt-600">'Change Axis'</span> button.</li>
-          <li>To change the orientation of a ship that's already placed on the board, you can click on it, beware that if the ship turns red it means that it can't be rotated due to unsufficient space.</li>
+          <li>To change the orientation of a ship that's already placed on the board, you can click on it, beware that if the ship turns red it means that it can't be rotated due to insufficient space.</li>
         </ul>
         </div>
         <div class="instructions_about">
